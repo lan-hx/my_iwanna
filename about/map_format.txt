@@ -1,0 +1,20 @@
+MAP
+SIZE_OF_MAP_FILE
+NUM_OF_ENTITIES
+	ENTITIES
+	size_of_entity_data
+	type
+	entity_id
+	x
+	y
+	hot_area
+		hot_area_type
+		hot_area_points
+	hidden
+	refresh_rate
+	number_of_states
+	state_pics
+	(track_num)
+	(tracks)
+BACK_GROUND_FILE
+FRAME_RATE

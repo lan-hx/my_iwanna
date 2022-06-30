@@ -3,3 +3,5 @@
 //
 
 #include "include/entity/Trap.h"
+
+Trap::Trap(const char *file) : Entity(file) {}

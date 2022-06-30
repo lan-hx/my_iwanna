@@ -5,6 +5,13 @@
 #ifndef MY_IWANNA_SRC_ENTITY_BARRIER_H_
 #define MY_IWANNA_SRC_ENTITY_BARRIER_H_
 
-class Barrier {};
+#include "entity/Entity.h"
+
+class Barrier : public Entity {
+ public:
+  explicit Barrier(const char *file);
+
+ private:
+};
 
 #endif  // MY_IWANNA_SRC_ENTITY_BARRIER_H_

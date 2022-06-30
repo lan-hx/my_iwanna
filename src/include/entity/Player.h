@@ -11,6 +11,7 @@
 
 class Player : public Entity {
  public:
+  explicit Player(const char *file);
   enum YState { on_ground, first_jump_begin, first_jump_end, second_jump_begin, second_jump_end };
   enum XState { idle, moving };
   void SetVx(int vx);
@@ -22,10 +23,14 @@ class Player : public Entity {
   int GetVy();
   XState GetXState();
   YState GetYState();
+  // facing_ = 0 : facing left
+  // facing_ = 1 : facing right
   int GetFacing();
 
  private:
   int32_t vx_, vy_;
+  // facing_ = 0 : facing left
+  // facing_ = 1 : facing right
   int32_t facing_;
   XState x_state_;
   YState y_state_;

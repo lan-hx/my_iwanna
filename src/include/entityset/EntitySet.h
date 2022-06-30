@@ -12,6 +12,7 @@
 class EntitySet {
  public:
   explicit EntitySet(std::vector<Entity *> &&entities) : entities_(std::move(entities)) {}
+  explicit EntitySet(std::vector<Entity *> &entities) : entities_(std::move(entities)) {}
   std::vector<Entity *> GetEntitySet() const;
 
  private:

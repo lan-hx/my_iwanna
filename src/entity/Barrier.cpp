@@ -3,3 +3,5 @@
 //
 
 #include "include/entity/Barrier.h"
+
+Barrier::Barrier(const char *file) : Entity(file) {}
