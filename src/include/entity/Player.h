@@ -10,7 +10,7 @@
 class Player : public Entity {
  public:
   enum YState { on_ground, first_jump_begin, first_jump_end, second_jump_begin, second_jump_end };
-  enum XState { idle, toleft, toright };
+  enum XState { idle, moving };
   void SetVx(int vx);
   void SetVy(int vy);
   void SetXState(XState state);

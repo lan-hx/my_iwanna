@@ -13,12 +13,20 @@ class Entity;
 
 class Game {
  public:
+  void Load(const char*);
+  void Reset();
+  void ResetAndLoad(const char*);
   void Event(std::vector<std::pair<char, bool>>);
   void Step();
+  void CloseMap();
+  bool MapLoaded();
   std::vector<Entity *> GetEntitySet() const;
 
  private:
   bool dead_ = false;
+  int death_cnt_ = 0;
+  long long step_cnt_ = 0ll;
+  const char* cur_map_;
   EntitySet *entities_;
 };
 
