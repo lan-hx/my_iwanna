@@ -13,7 +13,7 @@ int32_t HotArea::Load(const char *file) {
   switch (type) {
     case 0:
       type_ = rectangular;
-      point_num_ = 4;
+      point_num_ = 2;
       break;
     case 1:
       type_ = triangular;
@@ -34,4 +34,20 @@ int32_t HotArea::Load(const char *file) {
     coordinates_.emplace_back(std::make_pair(x, y));
   }
   return size;
+}
+
+HotAreaType HotArea::GetType()const{
+    return type_;
+}
+
+int32_t HotArea::GetX(const size_t &index)const{
+    return coordinates_[index].first;
+}
+
+int32_t HotArea::GetY(const size_t &index)const{
+    return coordinates_[index].second;
+}
+
+int32_t HotArea::GetPointNum() const{
+    return point_num_;
 }

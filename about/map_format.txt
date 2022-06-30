@@ -11,6 +11,7 @@ NUM_OF_ENTITIES
 		hot_area_type
 		hot_area_points
 	hidden
+	display_priority
 	refresh_rate
 	number_of_states
 	state_pics

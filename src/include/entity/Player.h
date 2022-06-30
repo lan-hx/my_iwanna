@@ -7,25 +7,31 @@
 
 #include <cstdint>
 
+#include "common/common.h"
 #include "entity/Entity.h"
 
 class Player : public Entity {
  public:
   explicit Player(const char *file);
-  enum YState { on_ground, first_jump_begin, first_jump_end, second_jump_begin, second_jump_end };
-  enum XState { idle, moving };
-  void SetVx(int vx);
-  void SetVy(int vy);
+  void SetVx(int32_t vx);
+  void SetVy(int32_t vy);
   void SetXState(XState state);
   void SetYState(YState state);
-  void SetFacing(int facing);
-  int GetVx();
-  int GetVy();
+  void SetFacing(int32_t facing);
+  void PrepareLeft();
+  void PrepareRight();
+  void HorizontalIdle();
+  void PrepareJump();
+  void Jump();
+  void TowardsLeft();
+  void TowardsRight();
+  int32_t GetVx();
+  int32_t GetVy();
   XState GetXState();
   YState GetYState();
   // facing_ = 0 : facing left
   // facing_ = 1 : facing right
-  int GetFacing();
+  int32_t GetFacing();
 
  private:
   int32_t vx_, vy_;
@@ -34,6 +40,7 @@ class Player : public Entity {
   int32_t facing_;
   XState x_state_;
   YState y_state_;
+  int32_t jump_cnt_;
 };
 
 #endif  // MY_IWANNA_SRC_ENTITY_PLAYER_H_

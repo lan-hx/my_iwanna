@@ -25,8 +25,10 @@ class Entity {
   int32_t GetCurState() const;
   int32_t GetDisplayPriority() const;
   int32_t Load(const char *);
+  const HotArea& GetHotArea() const;
+  EntityTypeId GetType() const;
 
-  bool friend Collide(Entity &en1, Entity &en2);
+  bool friend Collide(const Entity &en1, const Entity &en2);
 
  private:
   // const char *res_;  // picture of entity
