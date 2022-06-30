@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Game_over.png</file>
+        <file>kid/caper.png</file>
+        <file>kid/run1.png</file>
+        <file>kid/run2.png</file>
+        <file>kid/stand1.png</file>
+        <file>kid/stand2.png</file>
+        <file>kid/whereabouts.png</file>
+        <file>barrier/apple.png</file>
+        <file>barrier/Archive_point_off.png</file>
+        <file>barrier/Archive_point_on.png</file>
+        <file>barrier/door.png</file>
+        <file>barrier/grassland.png</file>
+        <file>barrier/land.png</file>
+        <file>barrier/Spikes.png</file>
+    </qresource>
+</RCC>

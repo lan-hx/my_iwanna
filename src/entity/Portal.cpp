@@ -3,3 +3,4 @@
 //
 
 #include "include/entity/Portal.h"
+Portal::Portal(const char *file) : Entity(file) {}

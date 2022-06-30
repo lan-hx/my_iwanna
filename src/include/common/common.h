@@ -1,8 +1,8 @@
-#ifndef MY_IWANNA_SRC_ENTITY_COMMON_H_ 
+#ifndef MY_IWANNA_SRC_ENTITY_COMMON_H_
 #define MY_IWANNA_SRC_ENTITY_COMMON_H_
 
-#include <cstdint>
 #include <cctype>
+#include <cstdint>
 #include <cstring>
 
 enum EntityTypeId { invalid_type = -1, player, barrier, trap, portal };

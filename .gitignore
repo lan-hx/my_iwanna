@@ -12,4 +12,5 @@
 /.vscode
 
 # for Qt Creator
-/build*
+/build-*
+CMakeLists.txt.user
