@@ -5,6 +5,8 @@
 #ifndef MY_IWANNA_SRC_ENTITY_PLAYER_H_
 #define MY_IWANNA_SRC_ENTITY_PLAYER_H_
 
+#include <cstdint>
+
 #include "entity/Entity.h"
 
 class Player : public Entity {
@@ -23,8 +25,8 @@ class Player : public Entity {
   int GetFacing();
 
  private:
-  int vx_, vy_;
-  int facing_;
+  int32_t vx_, vy_;
+  int32_t facing_;
   XState x_state_;
   YState y_state_;
 };

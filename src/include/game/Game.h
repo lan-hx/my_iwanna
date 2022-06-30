@@ -5,6 +5,7 @@
 #ifndef MY_IWANNA_SRC_GAME_GAME_H_
 #define MY_IWANNA_SRC_GAME_GAME_H_
 
+#include <cstdint>
 #include <vector>
 
 #include "entityset/EntitySet.h"
@@ -13,9 +14,9 @@ class Entity;
 
 class Game {
  public:
-  void Load(const char*);
+  void Load(const char *);
   void Reset();
-  void ResetAndLoad(const char*);
+  void ResetAndLoad(const char *);
   void Event(std::vector<std::pair<char, bool>>);
   void Step();
   void CloseMap();
@@ -24,9 +25,9 @@ class Game {
 
  private:
   bool dead_ = false;
-  int death_cnt_ = 0;
-  long long step_cnt_ = 0ll;
-  const char* cur_map_;
+  int32_t death_cnt_ = 0;
+  int64_t step_cnt_ = 0LL;
+  const char *cur_map_;
   EntitySet *entities_;
 };
 
