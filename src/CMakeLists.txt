@@ -1,22 +1,16 @@
 cmake_minimum_required(VERSION 3.13)
 
 FILE(GLOB_RECURSE IWANNA_SOURCE
-        ${PROJECT_SOURCE_DIR}/src/*/*.cpp
-        ${PROJECT_SOURCE_DIR}/src/*/*/*.cpp
-        ${PROJECT_SOURCE_DIR}/src/*/*.ui
-        ${PROJECT_SOURCE_DIR}/src/*/*/*.ui
-#        ${PROJECT_SOURCE_DIR}/src/*/*.c
-#        ${PROJECT_SOURCE_DIR}/src/*/*/*.c
+        ${PROJECT_SOURCE_DIR}/src/**/*.cpp
+        ${PROJECT_SOURCE_DIR}/src/**/*.ui
+        ${PROJECT_SOURCE_DIR}/src/**/*.h
+        ${PROJECT_SOURCE_DIR}/src/*.cpp
+        ${PROJECT_SOURCE_DIR}/src/*.ui
+        ${PROJECT_SOURCE_DIR}/src/*.h
         )
-if (DEFINED IWANNA_DYNAMIC_BUILD)
-    add_library(iwanna_lib SHARED ${IWANNA_SOURCE})
-else ()
-    ADD_LIBRARY(iwanna_lib STATIC ${IWANNA_SOURCE})
-endif ()
-TARGET_LINK_LIBRARIES(iwanna_lib PRIVATE Qt5::Widgets)
-
-ADD_EXECUTABLE(iwanna main.cpp mainwindow.cpp mainwindow.ui)
-TARGET_LINK_LIBRARIES(iwanna PRIVATE Qt5::Widgets iwanna_lib)
+message(STATUS "find sources: ${IWANNA_SOURCE}")
+ADD_EXECUTABLE(iwanna ${IWANNA_SOURCE})
+TARGET_LINK_LIBRARIES(iwanna PRIVATE Qt5::Widgets)
 set_target_properties(iwanna PROPERTIES
         MACOSX_BUNDLE_GUI_IDENTIFIER huaji
         MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}

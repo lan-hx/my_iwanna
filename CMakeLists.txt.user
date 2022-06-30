@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 7.0.2, 2022-06-28T12:10:11. -->
+<!-- Written by QtCreator 7.0.2, 2022-06-28T18:47:03. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -528,7 +528,7 @@
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">C:/Users/lan/source/repos/my_iwanna/build-my_iwanna-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/src</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">C:/Users/lan/source/repos/my_iwanna/build-my_iwanna-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/bin</value>
    </valuemap>
    <value type="qlonglong" key="ProjectExplorer.Target.RunConfigurationCount">1</value>
   </valuemap>
