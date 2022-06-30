@@ -15,7 +15,10 @@ class HotArea {
  public:
   explicit HotArea() { type_ = invalid_hotarea_type; }
   int32_t Load(const char *file);
-  enum HotAreaType { invalid_hotarea_type = -1, rectangular, triangular, point_set };
+  HotAreaType GetType() const;
+  int32_t GetX(const size_t &index)const;
+  int32_t GetY(const size_t &index)const;
+  int32_t GetPointNum() const;
 
  private:
   HotAreaType type_;
