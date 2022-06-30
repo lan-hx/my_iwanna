@@ -1,13 +1,13 @@
-#ifndef MY_IWANNA_SRC_ENTITY_COMMON_H_ 
+#ifndef MY_IWANNA_SRC_ENTITY_COMMON_H_
 #define MY_IWANNA_SRC_ENTITY_COMMON_H_
 
-#include <cstdint>
 #include <cctype>
+#include <cstdint>
 #include <cstring>
 
 enum EntityTypeId { invalid_type = -1, player, barrier, trap, portal };
 
-int32_t StringGetInt(const char *s, int32_t &x) {
+inline int32_t StringGetInt(const char *s, int32_t &x) {
   int32_t size = 0;
   bool neg = false;
   x = 0;
@@ -27,7 +27,7 @@ int32_t StringGetInt(const char *s, int32_t &x) {
   return size;
 }
 
-int32_t StringGetType(const char *s, EntityTypeId &t) {
+inline int32_t StringGetType(const char *s, EntityTypeId &t) {
   int32_t tmp;
   int32_t size;
   size = StringGetInt(s, tmp);
@@ -51,7 +51,7 @@ int32_t StringGetType(const char *s, EntityTypeId &t) {
   return size;
 }
 
-int32_t StringGetString(const char *s, char *str) {
+inline int32_t StringGetString(const char *s, char *str) {
   int32_t size = 0;
   while (*(s + size) <= 32) {
     ++size;

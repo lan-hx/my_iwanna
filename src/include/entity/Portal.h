@@ -9,7 +9,7 @@
 
 class Portal : public Entity {
  public:
-  explicit Portal(const char *);
+  explicit Portal(const char *file);
 
  private:
 };
