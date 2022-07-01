@@ -19,7 +19,7 @@ class Entity;
 class Game {
  public:
   explicit Game();
-  int32_t Load(const char *file);
+  int32_t Load(const char *file_name);
   void Reset();
   int32_t ResetAndLoad(const char *file);
   void Event(const std::vector<std::pair<Qt::Key, bool>> &key_events);

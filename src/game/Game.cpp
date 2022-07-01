@@ -33,7 +33,7 @@ Game::Game() {
   command_state_["Shoot"] = false;
 }
 
-int32_t Game::Load(const char *file) {
+int32_t Game::Load(const char *file_name) {
   int32_t file_size;
   int32_t cur_size = 0;
   int32_t entity_num;
@@ -42,6 +42,13 @@ int32_t Game::Load(const char *file) {
   EntityTypeId entity_type;
   std::vector<Entity *> entity_vec;
   int32_t background_len;
+  FILE *fin = fopen(file_name, "r");
+  fseek(fin, 0, SEEK_END);
+  file_size = ftell(fin);
+  fseek(fin, 0, SEEK_SET);
+  char *file = new char[file_size];
+  fread(file, sizeof(char), file_size, fin);
+  fclose(fin);
   cur_map_ = file;
   dead_ = false;
   death_cnt_ = 0;
