@@ -66,16 +66,19 @@ inline int32_t StringGetString(const char *s, char *str) {
   return size;
 }
 
-inline int64_t CrossProduct(const int32_t &x1, const int32_t &y1, const int32_t &x2, const int32_t &y2){
-    return static_cast<int64_t>(x1) * static_cast<int64_t>(y2) - static_cast<int64_t>(x2) * static_cast<int64_t>(y1);
+inline int64_t CrossProduct(const int32_t &x1, const int32_t &y1, const int32_t &x2, const int32_t &y2) {
+  return static_cast<int64_t>(x1) * static_cast<int64_t>(y2) - static_cast<int64_t>(x2) * static_cast<int64_t>(y1);
 }
 
-inline bool Intersect (const int32_t &x1, const int32_t &y1, const int32_t &x2, const int32_t &y2, const int32_t &x3, const int32_t &y3, const int32_t &x4, const int32_t &y4){
-    return (CrossProduct(x3 - x1, y3 - y1, x4 - x1, y4 - y1) * CrossProduct(x3 - x2, y3 - y2, x4 - x2, y4 - y2) <= 0);
+inline bool Intersect(const int32_t &x1, const int32_t &y1, const int32_t &x2, const int32_t &y2, const int32_t &x3,
+                      const int32_t &y3, const int32_t &x4, const int32_t &y4) {
+  return (CrossProduct(x3 - x1, y3 - y1, x4 - x1, y4 - y1) * CrossProduct(x3 - x2, y3 - y2, x4 - x2, y4 - y2) <= 0LL);
 }
 
-inline bool InTriangle(const int32_t &x, const int32_t &y, const int32_t &x1, const int32_t &y1, const int32_t &x2, const int32_t &y2, const int32_t &x3, const int32_t &y3){
-    return (!Intersect(x, y, x1, y1, x2, y2, x3, y3)) && (!Intersect(x, y, x2, y2, x1, y1, x3, y3)) &&(!Intersect(x, y, x3, y3, x1, y1, x2, y2));
+inline bool InTriangle(const int32_t &x, const int32_t &y, const int32_t &x1, const int32_t &y1, const int32_t &x2,
+                       const int32_t &y2, const int32_t &x3, const int32_t &y3) {
+  return (!Intersect(x, y, x1, y1, x2, y2, x3, y3)) && (!Intersect(x, y, x2, y2, x1, y1, x3, y3)) &&
+         (!Intersect(x, y, x3, y3, x1, y1, x2, y2));
 }
 
 #endif

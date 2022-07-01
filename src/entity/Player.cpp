@@ -45,3 +45,13 @@ void Player::PrepareJump() {
       break;
   }
 }
+
+void Player::Move() { Entity::SetPos(GetX() + vx_, GetY() + vy_); }
+
+void Player::BreakJump() {
+  if (y_state_ == first_jump_begin) {
+    y_state_ = first_jump_end;
+  } else if (y_state_ == second_jump_begin) {
+    y_state_ = second_jump_end;
+  }
+}

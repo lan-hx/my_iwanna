@@ -31,6 +31,9 @@ class Game {
   void SetFrameRate(int32_t);
   std::vector<Entity *> GetEntitySet() const;
   const char *GetBackgroundPic() const;
+  inline bool IsDead() const { return dead_; }
+  inline int32_t DeathCount() const { return death_cnt_; }
+  inline double PlayTime() const { return static_cast<double>(step_cnt_) / static_cast<double>(frame_rate_); }
 
  private:
   bool dead_ = false;

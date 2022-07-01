@@ -16,16 +16,18 @@ class Entity {
   // explicit Entity() = default;
   explicit Entity(const char *file);
   ~Entity();
-  int32_t GetX() const;
-  int32_t GetY() const;
-  void SetPos(int, int);
-  bool IsHidden() const;
+  inline int32_t GetX() const { return x_; }
+  inline int32_t GetY() const { return y_; }
+  void SetPos(const int32_t &x, const int32_t &y);
+  void MoveX(const int32_t &dx);
+  void MoveY(const int32_t &dy);
+  inline bool IsHidden() const { return hidden_ != 0; }
   void SetHidden(bool);
   const char *GetCurPic() const;
   int32_t GetCurState() const;
   int32_t GetDisplayPriority() const;
   int32_t Load(const char *);
-  const HotArea& GetHotArea() const;
+  const HotArea &GetHotArea() const;
   EntityTypeId GetType() const;
 
   bool friend Collide(const Entity &en1, const Entity &en2);

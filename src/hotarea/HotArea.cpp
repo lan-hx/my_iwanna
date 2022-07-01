@@ -36,18 +36,10 @@ int32_t HotArea::Load(const char *file) {
   return size;
 }
 
-HotAreaType HotArea::GetType()const{
-    return type_;
-}
+HotAreaType HotArea::GetType() const { return type_; }
 
-int32_t HotArea::GetX(const size_t &index)const{
-    return coordinates_[index].first;
-}
+int32_t HotArea::GetX(const size_t &index) const { return coordinates_[index].first; }
 
-int32_t HotArea::GetY(const size_t &index)const{
-    return coordinates_[index].second;
-}
+int32_t HotArea::GetY(const size_t &index) const { return coordinates_[index].second; }
 
-int32_t HotArea::GetPointNum() const{
-    return point_num_;
-}
+int32_t HotArea::GetPointNum() const { return point_num_; }

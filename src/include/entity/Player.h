@@ -25,8 +25,10 @@ class Player : public Entity {
   void Jump();
   void TowardsLeft();
   void TowardsRight();
-  int32_t GetVx();
-  int32_t GetVy();
+  void Move();
+  void BreakJump();
+  inline int32_t GetVx() const { return vx_; }
+  inline int32_t GetVy() const { return vy_; }
   XState GetXState();
   YState GetYState();
   // facing_ = 0 : facing left

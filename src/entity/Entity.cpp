@@ -33,10 +33,15 @@ Entity::~Entity() {
   }
 }
 
-const HotArea& Entity::GetHotArea()const{
-  return hot_area_;
+const HotArea &Entity::GetHotArea() const { return hot_area_; }
+
+EntityTypeId Entity::GetType() const { return type_; }
+
+void Entity::SetPos(const int32_t &x, const int32_t &y) {
+  x_ = x;
+  y_ = y;
 }
 
-EntityTypeId Entity::GetType() const{
-  return type_;
-}
+void Entity::MoveX(const int32_t &dx) { x_ += dx; }
+
+void Entity::MoveY(const int32_t &dy) { y_ += dy; }
