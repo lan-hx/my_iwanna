@@ -1,6 +1,7 @@
 #ifndef MY_IWANNA_SRC_ENTITY_COMMON_H_
 #define MY_IWANNA_SRC_ENTITY_COMMON_H_
 
+#include <cassert>
 #include <cctype>
 #include <cstdint>
 #include <cstring>
@@ -41,7 +42,7 @@ inline int64_t CrossProduct(const int32_t &x1, const int32_t &y1, const int32_t 
 
 inline bool Intersect(const int32_t &x1, const int32_t &y1, const int32_t &x2, const int32_t &y2, const int32_t &x3,
                       const int32_t &y3, const int32_t &x4, const int32_t &y4) {
-  return (CrossProduct(x3 - x1, y3 - y1, x4 - x1, y4 - y1) * CrossProduct(x3 - x2, y3 - y2, x4 - x2, y4 - y2) <= 0LL);
+  return (CrossProduct(x3 - x1, y3 - y1, x4 - x1, y4 - y1) * CrossProduct(x3 - x2, y3 - y2, x4 - x2, y4 - y2) < 0LL);
 }
 
 inline bool InTriangle(const int32_t &x, const int32_t &y, const int32_t &x1, const int32_t &y1, const int32_t &x2,

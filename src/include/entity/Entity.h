@@ -34,7 +34,7 @@ class Entity {
   inline int32_t GetWidth() const;
   inline int32_t GetHeight() const;
 
-  friend bool Collide(const Entity &en1, const Entity &en2);
+  friend int Collide(const Entity &en1, const Entity &en2);
   friend std::istream &operator>>(std::istream &i, Entity &entity);
 
  private:
