@@ -4,6 +4,8 @@
 
 #include "include/hotarea/HotArea.h"
 
+#include <cassert>
+
 HotAreaType HotArea::GetType() const { return type_; }
 
 int32_t HotArea::GetX(const size_t &index) const { return coordinates_[index].first; }
@@ -17,18 +19,20 @@ std::istream &operator>>(std::istream &i, HotArea &h) {
   int32_t x;
   int32_t y;
   i >> type;
+  i >> h.point_num_;
   switch (type) {
     case 0:
       h.type_ = rectangular;
-      h.point_num_ = 2;
+      assert((h.point_num_ == 2) && ("wrong rectangle type"));
+      //      h.point_num_ = 2;
       break;
     case 1:
       h.type_ = triangular;
-      h.point_num_ = 3;
+      assert((h.point_num_ == 3) && ("wrong triangle type"));
+      //      h.point_num_ = 3;
       break;
     case 2:
       h.type_ = point_set;
-      i >> h.point_num_;
       break;
     default:
       h.type_ = invalid_hotarea_type;

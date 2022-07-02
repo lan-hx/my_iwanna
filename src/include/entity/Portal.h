@@ -9,7 +9,7 @@
 
 class Portal : public Entity {
  public:
-  explicit Portal() = default;
+  explicit Portal() : Entity(portal) {}
 
   friend std::istream &operator>>(std::istream &i, Portal &p);
 

@@ -9,7 +9,7 @@
 
 class Trap : public Entity {
  public:
-  explicit Trap() = default;
+  explicit Trap() : Entity(trap) {}
 
   friend std::istream &operator>>(std::istream &i, Trap &t);
 

@@ -9,7 +9,7 @@
 
 class Barrier : public Entity {
  public:
-  explicit Barrier() = default;
+  explicit Barrier() : Entity(barrier) {}
 
   friend std::istream &operator>>(std::istream &i, Barrier &b);
 

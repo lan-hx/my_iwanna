@@ -14,21 +14,25 @@
 
 class Entity {
  public:
-  explicit Entity() = default;
+  explicit Entity(EntityTypeId type);
   ~Entity();
   inline int32_t GetX() const { return x_; }
   inline int32_t GetY() const { return y_; }
   void SetPos(const int32_t &x, const int32_t &y);
-  void MoveX(const int32_t &dx);
-  void MoveY(const int32_t &dy);
+  inline void MoveX(const int32_t &dx) { x_ += dx; }
+  inline void MoveY(const int32_t &dy) { y_ += dy; }
   inline bool IsHidden() const { return hidden_ != 0; }
-  void SetHidden(bool);
+  void SetHidden(bool hidden) { hidden_ = hidden ? 1 : 0; }
   const char *GetCurPic() const;
   int32_t GetCurState() const;
   int32_t GetDisplayPriority() const;
   int32_t Load(const char *);
-  const HotArea &GetHotArea() const;
-  EntityTypeId GetType() const;
+  inline const HotArea &GetHotArea() const { return hot_area_; }
+  inline EntityTypeId GetType() const { return type_; }
+  inline void SetType(const EntityTypeId &type) { type_ = type; }
+  inline DrawType GetDrawType() const;
+  inline int32_t GetWidth() const;
+  inline int32_t GetHeight() const;
 
   friend bool Collide(const Entity &en1, const Entity &en2);
   friend std::istream &operator>>(std::istream &i, Entity &entity);

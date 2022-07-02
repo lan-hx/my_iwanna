@@ -27,7 +27,7 @@ class Game {
   void CloseMap();
   bool MapLoaded();
   inline bool InGame() const { return in_game_; }
-  int32_t GetFrameRate() const;
+  inline int32_t GetFrameRate() const { return frame_rate_; }
   void SetFrameRate(int32_t);
   std::vector<Entity *> GetEntitySet() const;
   const char *GetBackgroundPic() const;
@@ -40,7 +40,7 @@ class Game {
   int32_t death_cnt_ = 0;
   int64_t step_cnt_ = 0LL;
   EntitySet *entities_;
-  char *background_pic_;
+  std::string background_pic_;
   bool in_game_ = false;
   int32_t frame_rate_ = 60;
   std::unordered_map<Qt::Key, std::string> key_command_map_;

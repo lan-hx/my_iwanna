@@ -10,6 +10,7 @@ enum EntityTypeId { invalid_type = -1, player, barrier, trap, portal };
 enum YState { on_ground, first_jump_begin, first_jump_end, second_jump_begin, second_jump_end };
 enum XState { idle, moving };
 enum HotAreaType { invalid_hotarea_type = -1, rectangular, triangular, point_set };
+enum DrawType { scaled, tiled };
 
 inline std::istream &operator>>(std::istream &i, EntityTypeId &t) {
   int32_t tmp;

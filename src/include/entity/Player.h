@@ -13,7 +13,7 @@
 
 class Player : public Entity {
  public:
-  explicit Player() = default;
+  explicit Player() : Entity(player) {}
   void SetVx(int32_t vx);
   void SetVy(int32_t vy);
   void SetXState(XState state);

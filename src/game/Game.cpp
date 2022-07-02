@@ -35,6 +35,15 @@ Game::Game() {
 }
 
 int32_t Game::Load(const char *file_name) {
+  if (strcmp(file_name, "") == 0) {
+    in_game_ = false;
+    return 1;
+  }
+  std::ifstream ifs(file_name);
+  if (!ifs.is_open()) {
+    in_game_ = false;
+    return 1;
+  }
   int32_t file_size;
   int32_t entity_num;
   int32_t entity_size;
@@ -42,7 +51,6 @@ int32_t Game::Load(const char *file_name) {
   EntityTypeId entity_type;
   std::vector<Entity *> entity_vec;
   int32_t background_len;
-  std::ifstream ifs(file_name);
   dead_ = false;
   death_cnt_ = 0;
   step_cnt_ = 0LL;
@@ -79,19 +87,17 @@ int32_t Game::Load(const char *file_name) {
   }
   entities_ = new EntitySet(std::move(entity_vec));
   ifs >> background_len;
-  background_pic_ = new char[background_len + 1];
-  ifs.read(background_pic_, background_len);
+  ifs >> background_pic_;
+  assert((background_pic_.length() == background_len) && ("background picture path error"));
   ifs >> frame_rate_;
-  if (ifs.eof() && ifs.tellg() == file_size) {
+  if (ifs.eof()) {
     ifs.close();
     in_game_ = true;
     return 0;
   }
-  else {
-    ifs.close();
-    in_game_ = false;
-    return 1;
-  }
+  ifs.close();
+  in_game_ = false;
+  return 1;
 }
 
 void Game::Reset() {
@@ -101,7 +107,7 @@ void Game::Reset() {
   entities_->Destroy();
   delete entities_;
   entities_ = nullptr;
-  delete[] background_pic_;
+  background_pic_.clear();
   background_pic_ = nullptr;
   in_game_ = false;
   frame_rate_ = 60;
