@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.13)
 
+# vcpkg init
+if(DEFINED VCPKG_DIR AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+    set(CMAKE_TOOLCHAIN_FILE ${VCPKG_DIR}/scripts/buildsystems/vcpkg.cmake CACHE STRING "Vcpkg toolchain file")
+endif()
+
 # update qt variables
 message("QT_PREFIX_DIR: ${QT_PREFIX_DIR}")
 list(APPEND CMAKE_PREFIX_PATH ${QT_PREFIX_DIR})
@@ -63,4 +68,4 @@ set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_BIN}")
 include_directories(src/include test/include)
 
 ADD_SUBDIRECTORY(src ${CMAKE_BINARY_DIR}/bin)
-#ADD_SUBDIRECTORY(test ${CMAKE_BINARY_DIR}/test)
+ADD_SUBDIRECTORY(test ${CMAKE_BINARY_DIR}/test)
