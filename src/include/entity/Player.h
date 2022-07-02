@@ -28,6 +28,7 @@ class Player : public Entity {
   void TowardsRight();
   void Move();
   void BreakJump();
+  void InteruptJump();
   inline int32_t GetVx() const { return vx_; }
   inline int32_t GetVy() const { return vy_; }
   XState GetXState();

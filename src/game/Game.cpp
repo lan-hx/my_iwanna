@@ -169,11 +169,12 @@ void Game::Step() {
   int32_t right = command_state_["Right"];
   int32_t jump = command_state_["Jump"];
   bool collision = false;
+  bool interrupt_jump = false;
   bool break_jump = false;
-  bool on_ground = false;
+  bool land = false;
   //   bool shoot = command_state_["Shoot"];
-  if (left ^ right) {
-    if (left) {
+  if ((left ^ right) != 0) {
+    if (left != 0) {
       //   player->PrepareLeft();
     } else {
       //   player->PrepareRight();
@@ -192,7 +193,7 @@ void Game::Step() {
   }
   int32_t vx = player->GetVx();
   int32_t vy = player->GetVy();
-  if (vy < 12) {
+  if (vy < 6) {
     ++vy;
     player->SetVy(vy);
   }
@@ -205,23 +206,17 @@ void Game::Step() {
         switch (Collide(*player, *entity)) {
           case 1:
             entity_set.emplace(entity);
-            break_jump = true;
+            interrupt_jump = true;
             break;
           case 2:
             entity_set.emplace(entity);
-            on_ground = true;
+            land = true;
             break;
           default:
             break;
         }
       }
     }
-  }
-  if (break_jump) {
-    player->BreakJump();
-  }
-  if (on_ground) {
-    player->SetYState(YState::on_ground);
   }
   while (!entity_set.empty()) {
     if ((dx == 0) && (dy == 0)) {
@@ -250,6 +245,15 @@ void Game::Step() {
         entity_set.erase(entity);
       }
     }
+  }
+  if (interrupt_jump) {
+    player->InteruptJump();
+  }
+  if (break_jump) {
+    player->BreakJump();
+  }
+  if (land) {
+    player->SetYState(YState::landed);
   }
   command_state_["Jump"] = command_state_["Jump"] & 1;
 }
