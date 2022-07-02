@@ -2,6 +2,7 @@
 #define GAMEUI_H
 
 #include <QElapsedTimer>
+#include <QKeyEvent>
 #include <QTimer>
 #include <QWidget>
 #include <cstdint>
@@ -18,10 +19,11 @@ class GameUI : public QWidget {
  public:
   explicit GameUI(QWidget *parent = nullptr);
   ~GameUI() override;
-  inline int32_t Load(const char *file_name) { return 0; }
-  inline void Stop() {}
+  int32_t Load(const char *file_name);
+  void Stop();
   void Pause();
   void Continue();
+  void SendKey(QKeyEvent *event, bool is_pressed);
 
  private:
   Ui::GameUI *ui;  // NOLINT
@@ -29,6 +31,7 @@ class GameUI : public QWidget {
   QTimer *timer_;
   QElapsedTimer time_;
   int64_t elasped_time_nsec_;
+  int32_t timer_time_;
 
  protected:
   void paintEvent(QPaintEvent *event) override;

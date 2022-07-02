@@ -1,8 +1,8 @@
 #include "mainwindow.h"
 
 #include <QFileDialog>
-#include <QKeyEvent>
 #include <QMessageBox>
+#include <QMovie>
 
 #include "UI/about/about.h"
 #include "ui_mainwindow.h"
@@ -50,12 +50,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   connect(ui->actionpause, &QAction::triggered, [&]() { emit Pause(); });
   connect(ui->actionstop, &QAction::triggered, [&]() { game_ui_->Stop(); });
   connect(ui->actionopen, &QAction::triggered, [&]() {
-    auto file_name = QFileDialog::getOpenFileName(this, "打开地图", "", ".map");
-    game_ui_->Load(file_name.toUtf8());
+    game_ui_->Pause();
+    auto file_name = QFileDialog::getOpenFileName(this, "打开地图", "", "");
+    if (game_ui_->Load(file_name.toUtf8()) != 0) {
+      QMessageBox::warning(this, "打开失败", "打开地图失败");
+    }
+    game_ui_->Continue();
   });
   connect(ui->actionexit, &QAction::triggered, [&]() { close(); });
-
-  // key event
+  connect(this, &MainWindow::SendKey, game_ui_, &GameUI::SendKey);
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -65,10 +68,14 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
     case Qt::Key_P:
       emit Pause();
       break;
-    default:;
+    default:
+      emit SendKey(event, true);
   }
 }
 void MainWindow::keyReleaseEvent(QKeyEvent *event) {
   auto key = event->key();
-  switch (key) { default:; }
+  switch (key) {
+    default:
+      emit SendKey(event, false);
+  }
 }

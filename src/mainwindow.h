@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QKeyEvent>
 #include <QLabel>
 #include <QMainWindow>
 
@@ -31,6 +32,7 @@ class MainWindow : public QMainWindow {
 
  signals:
   void Pause();
+  void SendKey(QKeyEvent *event, bool is_pressed);
 };
 
 #endif  // MAINWINDOW_H
