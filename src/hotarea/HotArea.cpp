@@ -4,38 +4,6 @@
 
 #include "include/hotarea/HotArea.h"
 
-int32_t HotArea::Load(const char *file) {
-  int32_t size = 0;
-  int32_t type;
-  int32_t x;
-  int32_t y;
-  size += StringGetInt(file + size, type);
-  switch (type) {
-    case 0:
-      type_ = rectangular;
-      point_num_ = 2;
-      break;
-    case 1:
-      type_ = triangular;
-      point_num_ = 3;
-      break;
-    case 2:
-      type_ = point_set;
-      size += StringGetInt(file + size, point_num_);
-      break;
-    default:
-      type_ = invalid_hotarea_type;
-      point_num_ = 0;
-      break;
-  }
-  for (int i = 0; i < point_num_; ++i) {
-    size += StringGetInt(file + size, x);
-    size += StringGetInt(file + size, y);
-    coordinates_.emplace_back(std::make_pair(x, y));
-  }
-  return size;
-}
-
 HotAreaType HotArea::GetType() const { return type_; }
 
 int32_t HotArea::GetX(const size_t &index) const { return coordinates_[index].first; }
@@ -43,3 +11,32 @@ int32_t HotArea::GetX(const size_t &index) const { return coordinates_[index].fi
 int32_t HotArea::GetY(const size_t &index) const { return coordinates_[index].second; }
 
 int32_t HotArea::GetPointNum() const { return point_num_; }
+
+std::istream &operator>>(std::istream &i, HotArea &h) {
+  int32_t type;
+  int32_t x;
+  int32_t y;
+  i >> type;
+  switch (type) {
+    case 0:
+      h.type_ = rectangular;
+      h.point_num_ = 2;
+      break;
+    case 1:
+      h.type_ = triangular;
+      h.point_num_ = 3;
+      break;
+    case 2:
+      h.type_ = point_set;
+      i >> h.point_num_;
+      break;
+    default:
+      h.type_ = invalid_hotarea_type;
+      h.point_num_ = 0;
+  }
+  for (int j = 0; j < h.point_num_; ++j) {
+    i >> x >> y;
+    h.coordinates_.emplace_back(x, y);
+  }
+  return i;
+}

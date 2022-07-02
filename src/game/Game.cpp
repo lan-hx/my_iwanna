@@ -10,6 +10,7 @@
 #include <cstdio>
 #include <cstring>
 #include <exception>
+#include <fstream>
 #include <unordered_set>
 #include <vector>
 
@@ -35,76 +36,68 @@ Game::Game() {
 
 int32_t Game::Load(const char *file_name) {
   int32_t file_size;
-  int32_t cur_size = 0;
   int32_t entity_num;
   int32_t entity_size;
   int32_t cur_entity_size;
   EntityTypeId entity_type;
   std::vector<Entity *> entity_vec;
   int32_t background_len;
-  FILE *fin = fopen(file_name, "r");
-  fseek(fin, 0, SEEK_END);
-  file_size = ftell(fin);
-  fseek(fin, 0, SEEK_SET);
-  char *file = new char[file_size];
-  fread(file, sizeof(char), file_size, fin);
-  fclose(fin);
-  cur_map_ = file;
+  std::ifstream ifs(file_name);
   dead_ = false;
   death_cnt_ = 0;
   step_cnt_ = 0LL;
-  cur_size += StringGetInt(file + cur_size, file_size);
-  cur_size += StringGetInt(file + cur_size, entity_num);
+  ifs >> file_size >> entity_num;
   for (int i = 0; i < entity_num; ++i) {
-    cur_size += StringGetInt(file + cur_size, entity_size);
-    StringGetType(file + cur_size, entity_type);
-    entity_vec.emplace_back(nullptr);
+    ifs >> entity_size >> entity_type;
     try {
+      Entity *e = nullptr;
       switch (entity_type) {
         case EntityTypeId::player:
-          entity_vec.back() = new Player(file + cur_size);
+          e = entity_vec.emplace_back(new Player());
+          ifs >> *static_cast<Player *>(e);
           break;
         case EntityTypeId::barrier:
-          entity_vec.back() = new Barrier(file + cur_size);
+          e = entity_vec.emplace_back(new Barrier());
+          ifs >> *static_cast<Barrier *>(e);
           break;
         case EntityTypeId::trap:
-          entity_vec.back() = new Trap(file + cur_size);
+          e = entity_vec.emplace_back(new Trap());
+          ifs >> *static_cast<Trap *>(e);
           break;
         case EntityTypeId::portal:
-          entity_vec.back() = new Portal(file + cur_size);
+          e = entity_vec.emplace_back(new Portal());
+          ifs >> *static_cast<Portal *>(e);
           break;
         case EntityTypeId::invalid_type:
-          entity_vec.pop_back();
           break;
+        default:;
       }
     } catch (std::exception &e) {
       in_game_ = false;
       return 1;
     }
-    cur_size += entity_size;
   }
   entities_ = new EntitySet(std::move(entity_vec));
-  cur_size += StringGetInt(file + cur_size, background_len);
+  ifs >> background_len;
   background_pic_ = new char[background_len + 1];
-  cur_size += StringGetString(file + cur_size, background_pic_);
-  cur_size += StringGetInt(file + cur_size, frame_rate_);
-  if (file_size != -1) {
-    if (cur_size == file_size) {
-      in_game_ = true;
-      return 0;
-    }
+  ifs.read(background_pic_, background_len);
+  ifs >> frame_rate_;
+  if (ifs.eof() && ifs.tellg() == file_size) {
+    ifs.close();
+    in_game_ = true;
+    return 0;
+  }
+  else {
+    ifs.close();
     in_game_ = false;
     return 1;
   }
-  in_game_ = true;
-  return 0;
 }
 
 void Game::Reset() {
   dead_ = false;
   death_cnt_ = 0;
   step_cnt_ = 0LL;
-  cur_map_ = nullptr;
   entities_->Destroy();
   delete entities_;
   entities_ = nullptr;
@@ -119,12 +112,10 @@ int32_t Game::ResetAndLoad(const char *file) {
   return Load(file);
 }
 
-void Game::Event(const std::vector<std::pair<Qt::Key, bool>> &key_events) {
-  for (auto key_event : key_events) {
-    std::unordered_map<Qt::Key, std::string>::iterator find_res = key_command_map_.find(key_event.first);
-    if (find_res != key_command_map_.end()) {
-      command_state_[(*find_res).second] = key_event.second;
-    }
+void Game::Event(const Qt::Key &key, bool is_pressed) {
+  std::unordered_map<Qt::Key, std::string>::iterator find_res = key_command_map_.find(key);
+  if (find_res != key_command_map_.end()) {
+    command_state_[(*find_res).second] = is_pressed;
   }
 }
 

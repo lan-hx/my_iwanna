@@ -4,36 +4,16 @@
 #include <cctype>
 #include <cstdint>
 #include <cstring>
+#include <istream>
 
 enum EntityTypeId { invalid_type = -1, player, barrier, trap, portal };
 enum YState { on_ground, first_jump_begin, first_jump_end, second_jump_begin, second_jump_end };
 enum XState { idle, moving };
 enum HotAreaType { invalid_hotarea_type = -1, rectangular, triangular, point_set };
 
-inline int32_t StringGetInt(const char *s, int32_t &x) {
-  int32_t size = 0;
-  bool neg = false;
-  x = 0;
-  while (*(s + size) <= 32) {
-    ++size;
-  }
-  if ((*(s + size) == '-') || (*(s + size) == '+')) {
-    neg = (*(s + size) == '-');
-    ++size;
-  }
-  while (isdigit(*(s + size)) != 0) {
-    x = x * 10 + *(s + size++) - 48;
-  }
-  if (neg) {
-    x = -x;
-  }
-  return size;
-}
-
-inline int32_t StringGetType(const char *s, EntityTypeId &t) {
+inline std::istream &operator>>(std::istream &i, EntityTypeId &t) {
   int32_t tmp;
-  int32_t size;
-  size = StringGetInt(s, tmp);
+  i >> tmp;
   switch (tmp) {
     case 0:
       t = EntityTypeId::player;
@@ -51,19 +31,7 @@ inline int32_t StringGetType(const char *s, EntityTypeId &t) {
       t = EntityTypeId::invalid_type;
       break;
   }
-  return size;
-}
-
-inline int32_t StringGetString(const char *s, char *str) {
-  int32_t size = 0;
-  while (*(s + size) <= 32) {
-    ++size;
-  }
-  while (*(s + size) > 32) {
-    *str++ = *(s + size++);
-  }
-  *str = '\0';
-  return size;
+  return i;
 }
 
 inline int64_t CrossProduct(const int32_t &x1, const int32_t &y1, const int32_t &x2, const int32_t &y2) {

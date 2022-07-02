@@ -3,5 +3,3 @@
 //
 
 #include "include/entityset/EntitySet.h"
-
-std::vector<Entity *> EntitySet::GetEntitySet() const { return std::vector<Entity *>(); }

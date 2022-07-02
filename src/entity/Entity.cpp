@@ -6,27 +6,6 @@
 
 #include "include/common/common.h"
 
-Entity::Entity(const char *file) {
-  int32_t size = 0;
-  int32_t str_len;
-  size += StringGetType(file + size, type_);
-  size += StringGetInt(file + size, entity_id_);
-  size += StringGetInt(file + size, x_);
-  size += StringGetInt(file + size, y_);
-  size += hot_area_.Load(file + size);
-  size += StringGetInt(file + size, hidden_);
-  size += StringGetInt(file + size, display_priority_);
-  size += StringGetInt(file + size, refresh_rate_);
-  size += StringGetInt(file + size, state_num_);
-  for (int i = 0; i < state_num_; ++i) {
-    size += StringGetInt(file + size, str_len);
-    state_pics_.emplace_back(nullptr);
-    state_pics_.back() = new char(str_len + 1);
-    size += StringGetString(file + size, state_pics_.back());
-  }
-  cur_state_ = 0;
-}
-
 Entity::~Entity() {
   for (auto pic : state_pics_) {
     delete[] pic;
@@ -45,3 +24,18 @@ void Entity::SetPos(const int32_t &x, const int32_t &y) {
 void Entity::MoveX(const int32_t &dx) { x_ += dx; }
 
 void Entity::MoveY(const int32_t &dy) { y_ += dy; }
+
+std::istream &operator>>(std::istream &i, Entity &e) {
+  int32_t str_len;
+  i >> e.type_ >> e.entity_id_ >> e.x_ >> e.y_;
+  i >> e.hot_area_;
+  i >> e.hidden_ >> e.display_priority_ >> e.refresh_rate_ >> e.state_num_;
+  for (int j = 0; j < e.state_num_; ++j) {
+    i >> str_len;
+    auto str = new char[str_len + 1];
+    i.read(str, str_len);
+    e.state_pics_.emplace_back(str);
+  }
+  e.cur_state_ = 0;
+  return i;
+}

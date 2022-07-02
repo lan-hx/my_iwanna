@@ -3,4 +3,8 @@
 //
 
 #include "include/entity/Portal.h"
-Portal::Portal(const char *file) : Entity(file) {}
+
+std::istream &operator>>(std::istream &i, Portal &p) {
+  i >> *static_cast<Entity *>(&p);
+  return i;
+}

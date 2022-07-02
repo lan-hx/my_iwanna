@@ -14,7 +14,7 @@ class EntitySet {
  public:
   explicit EntitySet(std::vector<Entity *> &&entities) : entities_(std::move(entities)) {}
   // explicit EntitySet(std::vector<Entity *> &entities) : entities_(std::move(entities)) {}
-  std::vector<Entity *> GetEntitySet() const;
+  inline std::vector<Entity *> GetEntitySet() const { return entities_; }
   void Destroy() {
     for (auto entity_ptr : entities_) {
       delete entity_ptr;

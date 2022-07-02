@@ -9,9 +9,13 @@
 
 class Barrier : public Entity {
  public:
-  explicit Barrier(const char *file);
+  explicit Barrier() = default;
+
+  friend std::istream &operator>>(std::istream &i, Barrier &b);
 
  private:
 };
+
+std::istream &operator>>(std::istream &i, Barrier &b);
 
 #endif  // MY_IWANNA_SRC_ENTITY_BARRIER_H_

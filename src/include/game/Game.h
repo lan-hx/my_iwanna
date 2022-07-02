@@ -22,11 +22,11 @@ class Game {
   int32_t Load(const char *file_name);
   void Reset();
   int32_t ResetAndLoad(const char *file);
-  void Event(const std::vector<std::pair<Qt::Key, bool>> &key_events);
+  void Event(const Qt::Key &key, bool is_pressed);
   void Step();
   void CloseMap();
   bool MapLoaded();
-  bool InGame() const;
+  inline bool InGame() const { return in_game_; }
   int32_t GetFrameRate() const;
   void SetFrameRate(int32_t);
   std::vector<Entity *> GetEntitySet() const;
@@ -39,10 +39,9 @@ class Game {
   bool dead_ = false;
   int32_t death_cnt_ = 0;
   int64_t step_cnt_ = 0LL;
-  const char *cur_map_;
   EntitySet *entities_;
   char *background_pic_;
-  bool in_game_;
+  bool in_game_ = false;
   int32_t frame_rate_ = 60;
   std::unordered_map<Qt::Key, std::string> key_command_map_;
   std::unordered_map<std::string, bool> command_state_;

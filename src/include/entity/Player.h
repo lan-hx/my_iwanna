@@ -6,13 +6,14 @@
 #define MY_IWANNA_SRC_ENTITY_PLAYER_H_
 
 #include <cstdint>
+#include <istream>
 
 #include "common/common.h"
 #include "entity/Entity.h"
 
 class Player : public Entity {
  public:
-  explicit Player(const char *file);
+  explicit Player() = default;
   void SetVx(int32_t vx);
   void SetVy(int32_t vy);
   void SetXState(XState state);
@@ -35,6 +36,8 @@ class Player : public Entity {
   // facing_ = 1 : facing right
   int32_t GetFacing();
 
+  friend std::istream &operator>>(std::istream &i, Player &p);
+
  private:
   int32_t vx_, vy_;
   // facing_ = 0 : facing left
@@ -44,5 +47,7 @@ class Player : public Entity {
   YState y_state_;
   int32_t jump_cnt_;
 };
+
+std::istream &operator>>(std::istream &i, Player &p);
 
 #endif  // MY_IWANNA_SRC_ENTITY_PLAYER_H_

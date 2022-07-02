@@ -9,9 +9,13 @@
 
 class Portal : public Entity {
  public:
-  explicit Portal(const char *file);
+  explicit Portal() = default;
+
+  friend std::istream &operator>>(std::istream &i, Portal &p);
 
  private:
 };
+
+std::istream &operator>>(std::istream &i, Portal &p);
 
 #endif  // MY_IWANNA_SRC_ENTITY_PORTAL_H_

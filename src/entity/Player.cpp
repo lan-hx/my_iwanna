@@ -4,14 +4,6 @@
 
 #include "include/entity/Player.h"
 
-Player::Player(const char *file) : Entity(file) {
-  vx_ = 0;
-  vy_ = 0;
-  facing_ = 0;
-  x_state_ = idle;
-  y_state_ = on_ground;
-}
-
 void Player::PrepareJump() {
   switch (y_state_) {
     case on_ground:
@@ -54,4 +46,14 @@ void Player::BreakJump() {
   } else if (y_state_ == second_jump_begin) {
     y_state_ = second_jump_end;
   }
+}
+
+std::istream &operator>>(std::istream &i, Player &p) {
+  i >> *static_cast<Entity *>(&p);
+  p.vx_ = 0;
+  p.vy_ = 0;
+  p.facing_ = 0;
+  p.x_state_ = idle;
+  p.y_state_ = on_ground;
+  return i;
 }

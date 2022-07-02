@@ -9,9 +9,13 @@
 
 class Trap : public Entity {
  public:
-  explicit Trap(const char *file);
+  explicit Trap() = default;
+
+  friend std::istream &operator>>(std::istream &i, Trap &t);
 
  private:
 };
+
+std::istream &operator>>(std::istream &i, Trap &t);
 
 #endif  // MY_IWANNA_SRC_ENTITY_ENEMY_H_

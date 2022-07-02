@@ -4,4 +4,7 @@
 
 #include "include/entity/Trap.h"
 
-Trap::Trap(const char *file) : Entity(file) {}
+std::istream &operator>>(std::istream &i, Trap &t) {
+  i >> *static_cast<Entity *>(&t);
+  return i;
+}

@@ -4,4 +4,7 @@
 
 #include "include/entity/Barrier.h"
 
-Barrier::Barrier(const char *file) : Entity(file) {}
+std::istream &operator>>(std::istream &i, Barrier &b) {
+  i >> *static_cast<Entity *>(&b);
+  return i;
+}

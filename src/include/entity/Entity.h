@@ -6,6 +6,7 @@
 #define MY_IWANNA_SRC_ENTITY_ENTITY_H_
 
 #include <cstdint>
+#include <istream>
 #include <string>
 
 #include "include/common/common.h"
@@ -13,8 +14,7 @@
 
 class Entity {
  public:
-  // explicit Entity() = default;
-  explicit Entity(const char *file);
+  explicit Entity() = default;
   ~Entity();
   inline int32_t GetX() const { return x_; }
   inline int32_t GetY() const { return y_; }
@@ -30,7 +30,8 @@ class Entity {
   const HotArea &GetHotArea() const;
   EntityTypeId GetType() const;
 
-  bool friend Collide(const Entity &en1, const Entity &en2);
+  friend bool Collide(const Entity &en1, const Entity &en2);
+  friend std::istream &operator>>(std::istream &i, Entity &entity);
 
  private:
   // const char *res_;  // picture of entity
@@ -46,5 +47,7 @@ class Entity {
   int32_t refresh_rate_;
   bool can_move_;
 };
+
+std::istream &operator>>(std::istream &i, Entity &entity);
 
 #endif  // MY_IWANNA_SRC_ENTITY_ENTITY_H_
