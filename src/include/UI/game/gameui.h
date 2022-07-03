@@ -40,7 +40,7 @@ class GameUI : public QWidget {
   void paintEvent(QPaintEvent *event) override;
 
  signals:
-  void UpdateInfo(int64_t nsec, int32_t death_count, double play_time);  // NOLINT
+  void UpdateInfo(int64_t nsec, int32_t death_count, double play_time, const char *debug_info);  // NOLINT
 };
 
 #endif  // GAMEUI_H

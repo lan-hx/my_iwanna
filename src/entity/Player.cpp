@@ -20,7 +20,7 @@ void Player::PrepareJump() {
       y_state_ = first_jump_begin;
       break;
     case first_jump_begin:
-      if (jump_cnt_ < 9) {
+      if (jump_cnt_ < FIRST_JUMP_CNT_MAX) {
         vy_ = -6;
         ++jump_cnt_;
       }
@@ -31,7 +31,7 @@ void Player::PrepareJump() {
       y_state_ = second_jump_begin;
       break;
     case second_jump_begin:
-      if (jump_cnt_ < 4) {
+      if (jump_cnt_ < SECOND_JUMP_CNT_MAX) {
         vy_ = -6;
         ++jump_cnt_;
       }
@@ -41,6 +41,23 @@ void Player::PrepareJump() {
       y_state_ = second_jump_begin;
     default:
       break;
+  }
+}
+
+bool Player::CanJump() {
+  switch (y_state_) {
+    case on_ground:
+      return true;
+    case first_jump_begin:
+      return (jump_cnt_ < FIRST_JUMP_CNT_MAX);
+    case first_jump_end:
+      return true;
+    case second_jump_begin:
+      return (jump_cnt_ < SECOND_JUMP_CNT_MAX);
+    case drifting:
+      return true;
+    default:
+      return false;
   }
 }
 
@@ -58,10 +75,11 @@ void Player::BreakJump() {
 
 void Player::InteruptJump() {
   if (y_state_ == first_jump_begin) {
-    jump_cnt_ = 9;
     vy_ = 0;
+    jump_cnt_ = FIRST_JUMP_CNT_MAX;
   } else if (y_state_ == second_jump_begin) {
     vy_ = 0;
+    jump_cnt_ = SECOND_JUMP_CNT_MAX;
   }
 }
 
@@ -85,7 +103,7 @@ void Player::PrepareLeft() {
       break;
     case moving:
       if (facing_ == 0) {
-        if (move_cnt_ < 3) {
+        if (move_cnt_ < MOVE_CNT_MAX) {
           --vx_;
           ++move_cnt_;
         }
@@ -111,7 +129,7 @@ void Player::PrepareRight() {
       break;
     case moving:
       if (facing_ == 1) {
-        if (move_cnt_ < 3) {
+        if (move_cnt_ < MOVE_CNT_MAX) {
           ++vx_;
           ++move_cnt_;
         }

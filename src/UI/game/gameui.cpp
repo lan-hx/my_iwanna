@@ -39,7 +39,7 @@ GameUI::GameUI(QWidget *parent) : QWidget(parent), ui(new Ui::GameUI), timer_(ne
           }
         }
       }
-      emit UpdateInfo(time_.nsecsElapsed(), game_.DeathCount(), game_.PlayTime());
+      emit UpdateInfo(time_.nsecsElapsed(), game_.DeathCount(), game_.PlayTime(), game_.GetDebugOutput());
       time_.restart();
     }
     update();

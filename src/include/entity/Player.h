@@ -11,6 +11,10 @@
 #include "common/common.h"
 #include "entity/Entity.h"
 
+#define FIRST_JUMP_CNT_MAX 9
+#define SECOND_JUMP_CNT_MAX 4
+#define MOVE_CNT_MAX 3
+
 class Player : public Entity {
  public:
   explicit Player();
@@ -29,10 +33,11 @@ class Player : public Entity {
   void Move();
   void BreakJump();
   void InteruptJump();
+  bool CanJump();
   inline int32_t GetVx() const { return vx_; }
   inline int32_t GetVy() const { return vy_; }
-  XState GetXState();
-  YState GetYState();
+  inline XState GetXState() const { return x_state_; }
+  inline YState GetYState() const { return y_state_; }
   // facing_ = 0 : facing left
   // facing_ = 1 : facing right
   int32_t GetFacing();

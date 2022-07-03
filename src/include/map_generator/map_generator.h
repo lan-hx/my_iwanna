@@ -13,12 +13,12 @@ void GenerateTestMap() {
   Barrier block;
   HotArea pha;
   HotArea bha;
-  player.SetPos(150, 500);
-  block.SetPos(100, 524);
+  player.SetPos(150, 300);
+  block.SetPos(100, 324);
   player.SetWidth(24);
   player.SetHeight(24);
   block.SetWidth(240);
-  block.SetHeight(24);
+  block.SetHeight(100);
   pha.SetType(rectangular);
   pha.SetPointNum(2);
   pha.AddPoint(0, 0);
@@ -26,7 +26,7 @@ void GenerateTestMap() {
   bha.SetType(rectangular);
   bha.SetPointNum(2);
   bha.AddPoint(0, 0);
-  bha.AddPoint(240, 24);
+  bha.AddPoint(240, 100);
   player.SetHotArea(pha);
   block.SetHotArea(bha);
   player.SetHidden(false);

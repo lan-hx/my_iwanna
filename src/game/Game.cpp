@@ -36,6 +36,14 @@ Game::Game() {
   command_state_["Shoot"] = 0;
 }
 
+const char *Game::GetDebugOutput() {
+  static std::string output;
+  output.clear();
+  Player *player = entities_->GetPlayer();
+  output = "x:" + std::to_string(player->GetX()) + " y:" + std::to_string(player->GetY());
+  return output.c_str();
+}
+
 int32_t Game::Load(const char *file_name) {
   if (strcmp(file_name, "") == 0) {
     in_game_ = false;
@@ -174,6 +182,7 @@ void Game::Step() {
   bool interrupt_jump = false;
   bool break_jump = false;
   bool land = false;
+  bool can_jump;
   //   bool shoot = command_state_["Shoot"];
   if ((left != 0) || (right != 0)) {
     if (left != 0) {
@@ -188,8 +197,11 @@ void Game::Step() {
   if ((jump & 4) != 0) {
     player->BreakJump();
   }
+  can_jump = player->CanJump();
   if ((jump & 1) != 0 || (jump & 2) != 0) {
-    player->PrepareJump();
+    if (can_jump) {
+      player->PrepareJump();
+    }
   }
   if ((jump & 1) == 0) {
     break_jump = true;
@@ -202,26 +214,28 @@ void Game::Step() {
   }
   int32_t dx = vx;
   int32_t dy = vy;
-  player->Move();
-  int32_t collision_pos = 0;
+  player->MoveTo(player->GetX(), player->GetY() + dy);
   for (auto entity : entities_->GetEntitySet()) {
     if (entity->GetType() == EntityTypeId::barrier) {
       if (!entity->IsHidden()) {
         switch (Collide(*player, *entity)) {
           case 1:
             entity_set.emplace(entity);
-            collision_pos |= 1;
+            if (vy > 0) {
+              land = true;
+            }
+            if (vy < 0) {
+              interrupt_jump = true;
+            }
             break;
-          case 2:
-            collision_pos |= 2;
-            entity_set.emplace(entity);
-            land = true;
-            break;
-          case 3:
-            collision_pos |= 2;
-            entity_set.emplace(entity);
-            interrupt_jump = true;
-            break;
+          // case 2:
+          //   entity_set.emplace(entity);
+          //   land = true;
+          //   break;
+          // case 3:
+          //   entity_set.emplace(entity);
+          //   interrupt_jump = true;
+          //   break;
           default:
             break;
         }
@@ -229,74 +243,99 @@ void Game::Step() {
     }
   }
   while (!entity_set.empty()) {
-    if ((dx == 0) && (dy == 0)) {
+    if (dy == 0) {
+      ++death_cnt_;
       dead_ = true;
       return;
     }
-    if (collision_pos == 3) {
-      if (abs((abs(dx) - 1) * abs(vy) - abs(vx) * abs(dy)) < abs(abs(dx) * abs(vy) - abs(vx) * (abs(dy) - 1))) {
-        if (vx > 0) {
-          player->MoveByX(-1);
-          --dx;
-        } else {
-          player->MoveByX(1);
-          ++dx;
-        }
-      } else {
-        if (vy > 0) {
-          player->MoveByY(-1);
-          --dy;
-        } else {
-          player->MoveByY(1);
-          ++dy;
-        }
-      }
+    if (vy > 0) {
+      player->MoveByY(-1);
+      --dy;
     } else {
-      if (collision_pos == 1) {
-        if (vx > 0) {
-          player->MoveByX(-1);
-          --dx;
-        } else {
-          player->MoveByX(1);
-          ++dx;
-        }
-      }
-      if (collision_pos == 2) {
-        if (vy > 0) {
-          player->MoveByY(-1);
-          --dy;
-        } else {
-          player->MoveByY(1);
-          ++dy;
-        }
-      }
+      player->MoveByY(1);
+      ++dy;
     }
-    collision_pos = 0;
     for (auto entity : entity_set) {
       switch (Collide(*player, *entity)) {
         case 0:
           entity_set.erase(entity);
           break;
-        case 1:
-          collision_pos |= 1;
+        // case 2:
+        //   land = true;
+        //   break;
+        // case 3:
+        //   interrupt_jump = true;
+        //   break;
+        default:
           break;
-        case 2:
-        case 3:
-          collision_pos |= 2;
+      }
+    }
+  }
+  player->MoveTo(player->GetX() + dx, player->GetY());
+  for (auto entity : entities_->GetEntitySet()) {
+    if (entity->GetType() == EntityTypeId::barrier) {
+      if (!entity->IsHidden()) {
+        switch (Collide(*player, *entity)) {
+          case 1:
+            // case 3:
+            // case 5:
+            // case 7:
+            entity_set.emplace(entity);
+            interrupt_jump = true;
+            break;
+          // case 2:
+          //   collision_pos |= 2;
+          //   entity_set.emplace(entity);
+          //   land = true;
+          //   break;
+          // case 3:
+          //   collision_pos |= 2;
+          //   entity_set.emplace(entity);
+          //   interrupt_jump = true;
+          //   break;
+          default:
+            break;
+        }
+      }
+    }
+  }
+  while (!entity_set.empty()) {
+    if (dx == 0) {
+      ++death_cnt_;
+      dead_ = true;
+      return;
+    }
+    if (vx > 0) {
+      player->MoveByX(-1);
+      --dx;
+    } else {
+      player->MoveByX(1);
+      ++dx;
+    }
+    for (auto entity : entity_set) {
+      switch (Collide(*player, *entity)) {
+        case 0:
+          entity_set.erase(entity);
           break;
         default:
           break;
       }
     }
   }
-  if (interrupt_jump) {
+  if (can_jump && interrupt_jump) {
     player->InteruptJump();
   }
   if (break_jump) {
     player->BreakJump();
   }
   if (land) {
-    player->SetYState(YState::landed);
+    player->SetYState(landed);
+  } else {
+    if (jump == 0) {
+      if (player->GetYState() == on_ground) {
+        player->SetYState(drifting);
+      }
+    }
   }
   command_state_["Jump"] = command_state_["Jump"] & 1;
 }
@@ -311,19 +350,20 @@ int32_t Collide(const Entity &en1, const Entity &en2) {
   int32_t maxx = en1.GetX() + ha1.GetX(1);
   int32_t miny = en1.GetY() + ha1.GetY(0);
   int32_t maxy = en1.GetY() + ha1.GetY(1);
+  int32_t ret = 0;
   switch (ha2.GetType()) {
     case rectangular:
       if ((maxx > en2.GetX() + ha2.GetX(0)) && (en2.GetX() + ha2.GetX(1) > minx) && (maxy > en2.GetY() + ha2.GetY(0)) &&
           (en2.GetY() + ha2.GetY(1) > miny)) {
-        if (maxy < en2.GetY() + ha2.GetY(1)) {
-          return 2;
-        }
-        if (miny > en2.GetY() + ha2.GetY(0)) {
-          return 3;
-        }
-        return 1;
+        // if (maxy < en2.GetY() + ha2.GetY(1)) {
+        //   ret |= 2;
+        // }
+        // if (miny > en2.GetY() + ha2.GetY(0)) {
+        //   ret |= 4;
+        // }
+        ret |= 1;
       }
-      return 0;
+      return ret;
     case triangular: {
       int32_t x1 = en2.GetX() + ha2.GetX(0);
       int32_t y1 = en2.GetY() + ha2.GetY(0);

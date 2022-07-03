@@ -34,6 +34,7 @@ class Game {
   inline bool IsDead() const { return dead_; }
   inline int32_t DeathCount() const { return death_cnt_; }
   inline double PlayTime() const { return static_cast<double>(step_cnt_) / static_cast<double>(frame_rate_); }
+  const char *GetDebugOutput();
 
  private:
   bool dead_ = false;

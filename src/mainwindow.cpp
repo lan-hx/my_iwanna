@@ -15,6 +15,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   ui->statusbar->addWidget(play_time_);
   death_count_ = new QLabel(this);
   ui->statusbar->addWidget(death_count_);
+  debug_output_ = new QLabel(this);
+  ui->statusbar->addWidget(debug_output_);
   fps_ = new QLabel(this);
   fps_->setFixedWidth(80);
   ui->statusbar->addPermanentWidget(fps_);
@@ -27,12 +29,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   game_ui_->setFixedSize(800, 600);
   adjustSize();
 
-  connect(game_ui_, &GameUI::UpdateInfo, [&](int64_t nsec, int32_t death_count, double play_time) {
-    play_time_->setText(QString("played time: %1s").arg(QString::number(play_time, 'f', 0)));
-    death_count_->setText("death count: " + QString::number(death_count));
-    fps_->setText("FPS: " + QString::number(1e9 / nsec, 'f', 2));
-    frame_latency_->setText("latency: " + QString::number(nsec / 1e6, 'f', 2) + "ms");
-  });
+  connect(game_ui_, &GameUI::UpdateInfo,
+          [&](int64_t nsec, int32_t death_count, double play_time, const char *debug_info) {
+            play_time_->setText(QString("played time: %1s").arg(QString::number(play_time, 'f', 0)));
+            death_count_->setText("death count: " + QString::number(death_count));
+            debug_output_->setText(debug_info);
+            fps_->setText("FPS: " + QString::number(1e9 / nsec, 'f', 2));
+            frame_latency_->setText("latency: " + QString::number(nsec / 1e6, 'f', 2) + "ms");
+          });
 
   // connect
   connect(this, &MainWindow::Pause, [&]() {

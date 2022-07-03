@@ -22,6 +22,7 @@ class MainWindow : public QMainWindow {
   Ui::MainWindow *ui;
   QLabel *death_count_;
   QLabel *play_time_;
+  QLabel *debug_output_;
   QLabel *fps_;
   QLabel *frame_latency_;
   GameUI *game_ui_;
