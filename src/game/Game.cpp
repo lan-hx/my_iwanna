@@ -28,10 +28,10 @@ Game::Game() {
   key_command_map_[Qt::Key_Right] = "Right";
   key_command_map_[Qt::Key_Shift] = "Jump";
   key_command_map_[Qt::Key_Z] = "Shoot";
-  command_state_["Left"] = false;
-  command_state_["Right"] = false;
-  command_state_["Jump"] = false;
-  command_state_["Shoot"] = false;
+  command_state_["Left"] = 0;
+  command_state_["Right"] = 0;
+  command_state_["Jump"] = 0;
+  command_state_["Shoot"] = 0;
 }
 
 int32_t Game::Load(const char *file_name) {
@@ -121,7 +121,22 @@ int32_t Game::ResetAndLoad(const char *file) {
 void Game::Event(const Qt::Key &key, bool is_pressed) {
   std::unordered_map<Qt::Key, std::string>::iterator find_res = key_command_map_.find(key);
   if (find_res != key_command_map_.end()) {
-    command_state_[(*find_res).second] = is_pressed;
+    if ((*find_res).second == "Jump") {
+      if (is_pressed) {
+        if ((command_state_["Jump"] & 1) == 0) {
+          command_state_["Jump"] |= 4;
+        }
+      } else {
+        if ((command_state_["Jump"] & 1) == 1) {
+          command_state_["Jump"] |= 2;
+        }
+      }
+    }
+    if (is_pressed) {
+      command_state_[(*find_res).second] |= 1;
+    } else {
+      command_state_[(*find_res).second] &= 0xFFFFFFFE;
+    }
   }
 }
 
@@ -150,13 +165,16 @@ void Game::Step() {
   ++step_cnt_;
   Player *player = entities_->GetPlayer();
   std::unordered_set<Entity *> entity_set;
-  bool left = command_state_["Left"];
-  bool right = command_state_["Right"];
-  bool jump = command_state_["Jump"];
+  int32_t left = command_state_["Left"];
+  int32_t right = command_state_["Right"];
+  int32_t jump = command_state_["Jump"];
   bool collision = false;
+  bool interrupt_jump = false;
+  bool break_jump = false;
+  bool land = false;
   //   bool shoot = command_state_["Shoot"];
-  if (left ^ right) {
-    if (left) {
+  if ((left ^ right) != 0) {
+    if (left != 0) {
       //   player->PrepareLeft();
     } else {
       //   player->PrepareRight();
@@ -164,25 +182,41 @@ void Game::Step() {
   } else {
     // player->HorizontalIdle();
   }
-  if (jump) {
+  if ((jump & 4) != 0) {
+    player->BreakJump();
+  }
+  if ((jump & 1) != 0 || (jump & 2) != 0) {
     player->PrepareJump();
+  }
+  if ((jump & 1) == 0) {
+    break_jump = true;
   }
   int32_t vx = player->GetVx();
   int32_t vy = player->GetVy();
+  if (vy < 6) {
+    ++vy;
+    player->SetVy(vy);
+  }
   int32_t dx = vx;
   int32_t dy = vy;
   player->Move();
   for (auto entity : entities_->GetEntitySet()) {
     if (entity->GetType() == EntityTypeId::barrier) {
       if (!entity->IsHidden()) {
-        if (Collide(*player, *entity)) {
-          entity_set.emplace(entity);
+        switch (Collide(*player, *entity)) {
+          case 1:
+            entity_set.emplace(entity);
+            interrupt_jump = true;
+            break;
+          case 2:
+            entity_set.emplace(entity);
+            land = true;
+            break;
+          default:
+            break;
         }
       }
     }
-  }
-  if (!entity_set.empty()) {
-    player->BreakJump();
   }
   while (!entity_set.empty()) {
     if ((dx == 0) && (dy == 0)) {
@@ -191,34 +225,44 @@ void Game::Step() {
     }
     if (abs((dx - 1) * vy - vx * dy) < abs(dx * vy - vx * (dy - 1))) {
       if (vx > 0) {
-        player->MoveX(-1);
+        player->MoveByX(-1);
         --dx;
       } else {
-        player->MoveX(1);
+        player->MoveByX(1);
         ++dx;
       }
     } else {
       if (vy > 0) {
-        player->MoveY(-1);
+        player->MoveByY(-1);
         --dy;
       } else {
-        player->MoveY(1);
+        player->MoveByY(1);
         ++dy;
       }
     }
     for (auto entity : entity_set) {
-      if (!Collide(*player, *entity)) {
+      if (Collide(*player, *entity) == 0) {
         entity_set.erase(entity);
       }
     }
   }
+  if (interrupt_jump) {
+    player->InteruptJump();
+  }
+  if (break_jump) {
+    player->BreakJump();
+  }
+  if (land) {
+    player->SetYState(YState::landed);
+  }
+  command_state_["Jump"] = command_state_["Jump"] & 1;
 }
 
-bool Collide(const Entity &en1, const Entity &en2) {
+int32_t Collide(const Entity &en1, const Entity &en2) {
   const HotArea &ha1 = en1.GetHotArea();
   const HotArea &ha2 = en2.GetHotArea();
   if (en1.GetType() != player) {
-    return false;
+    return 0;
   }
   int32_t minx = en1.GetX() + ha1.GetX(0);
   int32_t maxx = en1.GetX() + ha1.GetX(1);
@@ -226,8 +270,14 @@ bool Collide(const Entity &en1, const Entity &en2) {
   int32_t maxy = en1.GetY() + ha1.GetY(1);
   switch (ha2.GetType()) {
     case rectangular:
-      return (maxx >= en2.GetX() + ha2.GetX(0)) && (en2.GetX() + ha2.GetX(1) >= minx) &&
-             (maxy >= en2.GetY() + ha2.GetY(0)) && (en2.GetY() + ha2.GetY(1) >= miny);
+      if ((maxx > en2.GetX() + ha2.GetX(0)) && (en2.GetX() + ha2.GetX(1) > minx) && (maxy > en2.GetY() + ha2.GetY(0)) &&
+          (en2.GetY() + ha2.GetY(1) > miny)) {
+        if (maxy < en2.GetY() + ha2.GetY(1)) {
+          return 2;
+        }
+        return 1;
+      }
+      return 0;
     case triangular: {
       int32_t x1 = en2.GetX() + ha2.GetX(0);
       int32_t y1 = en2.GetY() + ha2.GetY(0);
@@ -235,41 +285,41 @@ bool Collide(const Entity &en1, const Entity &en2) {
       int32_t y2 = en2.GetY() + ha2.GetY(1);
       int32_t x3 = en2.GetX() + ha2.GetX(2);
       int32_t y3 = en2.GetY() + ha2.GetY(2);
-      if ((x1 >= minx) && (x1 <= maxx) && (y1 >= miny) && (y1 <= maxy)) {
-        return true;
+      if ((x1 > minx) && (x1 < maxx) && (y1 > miny) && (y1 < maxy)) {
+        return 1;
       }
-      if ((x2 >= minx) && (x2 <= maxx) && (y2 >= miny) && (y2 <= maxy)) {
-        return true;
+      if ((x2 > minx) && (x2 < maxx) && (y2 > miny) && (y2 < maxy)) {
+        return 1;
       }
-      if ((x3 >= minx) && (x3 <= maxx) && (y3 >= miny) && (y3 <= maxy)) {
-        return true;
+      if ((x3 > minx) && (x3 < maxx) && (y3 > miny) && (y3 < maxy)) {
+        return 1;
       }
       if (InTriangle(minx, miny, x1, y1, x2, y2, x3, y3)) {
-        return true;
+        return 1;
       }
       if (InTriangle(minx, maxy, x1, y1, x2, y2, x3, y3)) {
-        return true;
+        return 1;
       }
       if (InTriangle(maxx, miny, x1, y1, x2, y2, x3, y3)) {
-        return true;
+        return 1;
       }
       if (InTriangle(maxx, maxy, x1, y1, x2, y2, x3, y3)) {
-        return true;
+        return 1;
       }
-      return false;
+      return 0;
     }
     case point_set:
       for (int i = 0; i < ha2.GetPointNum(); ++i) {
         int32_t x = en2.GetX() + ha2.GetX(i);
         int32_t y = en2.GetY() + ha2.GetY(i);
         if ((x >= minx) && (x <= maxx) && (y >= miny) && (y <= maxy)) {
-          return true;
+          return 1;
         }
       }
-      return false;
+      return 0;
     case invalid_hotarea_type:
-      return false;
+      return 0;
     default:
-      return false;
+      return 0;
   }
 }

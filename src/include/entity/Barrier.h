@@ -5,6 +5,7 @@
 #ifndef MY_IWANNA_SRC_ENTITY_BARRIER_H_
 #define MY_IWANNA_SRC_ENTITY_BARRIER_H_
 
+#include "common/common.h"
 #include "entity/Entity.h"
 
 class Barrier : public Entity {

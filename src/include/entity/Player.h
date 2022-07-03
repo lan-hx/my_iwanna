@@ -14,11 +14,11 @@
 class Player : public Entity {
  public:
   explicit Player() : Entity(player) {}
-  void SetVx(int32_t vx);
-  void SetVy(int32_t vy);
-  void SetXState(XState state);
-  void SetYState(YState state);
-  void SetFacing(int32_t facing);
+  inline void SetVx(int32_t vx) { vx_ = vx; }
+  inline void SetVy(int32_t vy) { vy_ = vy; }
+  inline void SetXState(XState state) { x_state_ = state; }
+  inline void SetYState(YState state) { y_state_ = state; }
+  inline void SetFacing(int32_t facing) { facing_ = facing; }
   void PrepareLeft();
   void PrepareRight();
   void HorizontalIdle();
@@ -28,6 +28,7 @@ class Player : public Entity {
   void TowardsRight();
   void Move();
   void BreakJump();
+  void InteruptJump();
   inline int32_t GetVx() const { return vx_; }
   inline int32_t GetVy() const { return vy_; }
   XState GetXState();

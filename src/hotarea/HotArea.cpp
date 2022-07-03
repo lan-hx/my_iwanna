@@ -44,3 +44,18 @@ std::istream &operator>>(std::istream &i, HotArea &h) {
   }
   return i;
 }
+
+int32_t HotArea::SerializeTo(char *str) {
+  int32_t size = 0;
+  sprintf(str + size, "%8d", type_);
+  size += 8;
+  sprintf(str + size, "%8d", point_num_);
+  size += 8;
+  for (int i = 0; i < point_num_; ++i) {
+    sprintf(str + size, "%8d", coordinates_[i].first);
+    size += 8;
+    sprintf(str + size, "%8d", coordinates_[i].second);
+    size += 8;
+  }
+  return size;
+}

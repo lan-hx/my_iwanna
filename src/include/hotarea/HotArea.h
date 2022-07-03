@@ -15,10 +15,16 @@
 class HotArea {
  public:
   explicit HotArea() { type_ = invalid_hotarea_type; }
+  HotArea &operator=(const HotArea &ha) = default;
   HotAreaType GetType() const;
   int32_t GetX(const size_t &index) const;
   int32_t GetY(const size_t &index) const;
   int32_t GetPointNum() const;
+  inline void SetType(const HotAreaType &type) { type_ = type; }
+  inline void SetPointNum(const int32_t &num) { point_num_ = num; }
+  inline void AddPoint(const int32_t &x, const int32_t &y) { coordinates_.emplace_back(std::make_pair(x, y)); }
+
+  int32_t SerializeTo(char *str);
 
   friend std::istream &operator>>(std::istream &i, HotArea &h);
 

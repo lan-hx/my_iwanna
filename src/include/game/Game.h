@@ -44,9 +44,9 @@ class Game {
   bool in_game_ = false;
   int32_t frame_rate_ = 60;
   std::unordered_map<Qt::Key, std::string> key_command_map_;
-  std::unordered_map<std::string, bool> command_state_;
+  std::unordered_map<std::string, int32_t> command_state_;
 };
 
-bool Collide(const Entity &en1, const Entity &en2);
+int32_t Collide(const Entity &en1, const Entity &en2);
 
 #endif  // MY_IWANNA_SRC_GAME_GAME_H_
