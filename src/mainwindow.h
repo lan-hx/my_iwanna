@@ -23,7 +23,7 @@ class MainWindow : public QMainWindow {
   QLabel *death_count_;
   QLabel *play_time_;
   QLabel *fps_;
-  QLabel *frame_lag_;
+  QLabel *frame_latency_;
   GameUI *game_ui_;
 
  protected:

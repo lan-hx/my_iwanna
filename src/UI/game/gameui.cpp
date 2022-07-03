@@ -3,6 +3,7 @@
 #include <QBrush>
 #include <QDebug>
 #include <QLabel>
+#include <QMessageBox>
 #include <QMovie>
 #include <QPainter>
 #include <QPixmap>
@@ -14,6 +15,30 @@ GameUI::GameUI(QWidget *parent) : QWidget(parent), ui(new Ui::GameUI), timer_(ne
   connect(timer_, &QTimer::timeout, [&]() {
     if (game_.InGame()) {
       game_.Step();
+      for (const auto &entity : game_.GetEntitySet()) {
+        if (entity->GetType() == player) {
+          if (!gifs_.contains(entity->GetEntityId())) {
+            // brand new gif
+            QLabel *label = new QLabel(this);
+            QMovie *movie = new QMovie(label);
+            movie->setFileName(entity->GetCurPic());
+            label->setMovie(movie);
+            movie->start();
+            label->show();
+            gifs_.emplace(entity->GetEntityId(), label);
+          } else if (gifs_[entity->GetEntityId()]->movie()->fileName() != entity->GetCurPic()) {
+            // gif changed
+            delete gifs_[entity->GetEntityId()];
+            QLabel *label = new QLabel(this);
+            QMovie *movie = new QMovie(label);
+            movie->setFileName(entity->GetCurPic());
+            label->setMovie(movie);
+            movie->start();
+            label->show();
+            gifs_[entity->GetEntityId()] = label;
+          }
+        }
+      }
       emit UpdateInfo(time_.nsecsElapsed(), game_.DeathCount(), game_.PlayTime());
       time_.restart();
     }
@@ -55,14 +80,26 @@ void GameUI::paintEvent(QPaintEvent *event) {
 
   if (game_.InGame()) {
     for (const auto &entity : game_.GetEntitySet()) {
-      bool ret = pixmap.load(":/hero/westMoving.gif");
-      if (!ret) {
-        // qDebug() << "图片加载失败： " << entity->GetCurPic();
+      if (entity->GetType() == player) {
+        if (gifs_.contains(entity->GetEntityId())) {
+          gifs_[entity->GetEntityId()]->move(entity->GetX(), entity->GetY());
+        }
+      } else {
+        bool ret = pixmap.load(entity->GetCurPic());
+        if (!ret) {
+          QMessageBox::warning(this, "图片加载失败", "图片加载失败！");
+        }
+        switch (entity->GetDrawType()) {
+          case tiled:
+            painter.drawTiledPixmap(entity->GetX(), entity->GetY(), entity->GetWidth(), entity->GetHeight(), pixmap);
+            break;
+          case scaled:
+            painter.drawPixmap(entity->GetX(), entity->GetY(), entity->GetWidth(), entity->GetHeight(), pixmap);
+        }
       }
-      // painter.drawPixmap(entity->GetX(), entity->GetY(), pixmap);
-      painter.drawTiledPixmap(entity->GetX(), entity->GetY(), pixmap.width(), pixmap.height(), pixmap);
     }
   } else {
+    // bg
     brush.setStyle(Qt::SolidPattern);
     brush.setColor(Qt::cyan);
     painter.setBrush(brush);
@@ -82,6 +119,9 @@ int32_t GameUI::Load(const char *file_name) {
 void GameUI::Stop() {
   timer_->stop();
   // game_.CloseMap();
+  for (auto &gif : gifs_) {
+    delete gif.second;
+  }
 }
 void GameUI::Pause() { timer_->stop(); }
 void GameUI::Continue() { timer_->start(); }

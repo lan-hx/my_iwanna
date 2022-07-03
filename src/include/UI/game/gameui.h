@@ -3,9 +3,11 @@
 
 #include <QElapsedTimer>
 #include <QKeyEvent>
+#include <QLabel>
 #include <QTimer>
 #include <QWidget>
 #include <cstdint>
+#include <unordered_map>
 
 #include "game/Game.h"
 
@@ -32,6 +34,7 @@ class GameUI : public QWidget {
   QElapsedTimer time_;
   int64_t elasped_time_nsec_;
   int32_t timer_time_;
+  std::unordered_map<int32_t, QLabel *> gifs_;
 
  protected:
   void paintEvent(QPaintEvent *event) override;
