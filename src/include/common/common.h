@@ -1,5 +1,5 @@
-#ifndef MY_IWANNA_SRC_ENTITY_COMMON_H_
-#define MY_IWANNA_SRC_ENTITY_COMMON_H_
+#ifndef MY_IWANNA_SRC_COMMON_COMMON_H_
+#define MY_IWANNA_SRC_COMMON_COMMON_H_
 
 #include <cassert>
 #include <cctype>
@@ -35,6 +35,23 @@ inline std::istream &operator>>(std::istream &i, EntityTypeId &t) {
   }
   return i;
 }
+
+// std::istream &operator>>(std::istream &i, DrawType &t) {
+//   int32_t tmp;
+//   i >> tmp;
+//   switch (tmp) {
+//     case 0:
+//       t = scaled;
+//       break;
+//     case 1:
+//       t = tiled;
+//       break;
+//     default:
+//       t = tiled;
+//       break;
+//   }
+//   return i;
+// }
 
 inline int64_t CrossProduct(const int32_t &x1, const int32_t &y1, const int32_t &x2, const int32_t &y2) {
   return static_cast<int64_t>(x1) * static_cast<int64_t>(y2) - static_cast<int64_t>(x2) * static_cast<int64_t>(y1);

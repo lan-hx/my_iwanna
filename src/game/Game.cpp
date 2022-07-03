@@ -225,18 +225,18 @@ void Game::Step() {
     }
     if (abs((dx - 1) * vy - vx * dy) < abs(dx * vy - vx * (dy - 1))) {
       if (vx > 0) {
-        player->MoveX(-1);
+        player->MoveByX(-1);
         --dx;
       } else {
-        player->MoveX(1);
+        player->MoveByX(1);
         ++dx;
       }
     } else {
       if (vy > 0) {
-        player->MoveY(-1);
+        player->MoveByY(-1);
         --dy;
       } else {
-        player->MoveY(1);
+        player->MoveByY(1);
         ++dy;
       }
     }
