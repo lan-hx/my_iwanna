@@ -9,8 +9,8 @@
 #include <istream>
 #include <string>
 
-#include "include/common/common.h"
-#include "include/hotarea/HotArea.h"
+#include "common/common.h"
+#include "hotarea/HotArea.h"
 
 class Entity {
  public:
@@ -50,7 +50,7 @@ class Entity {
   friend int Collide(const Entity &en1, const Entity &en2);
   friend std::istream &operator>>(std::istream &i, Entity &entity);
 
- private:
+  //  private:
   // const char *res_;  // picture of entity
   int32_t entity_id_;
   EntityTypeId type_;

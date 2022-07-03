@@ -10,7 +10,7 @@
 #include <utility>
 #include <vector>
 
-#include "include/common/common.h"
+#include "common/common.h"
 
 class HotArea {
  public:
