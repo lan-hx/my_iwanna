@@ -1,6 +1,7 @@
 #ifndef MY_IWANNA_SRC_COMMON_COMMON_H_
 #define MY_IWANNA_SRC_COMMON_COMMON_H_
 
+#include <algorithm>
 #include <cassert>
 #include <cctype>
 #include <cstdint>

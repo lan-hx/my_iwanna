@@ -4,6 +4,14 @@
 
 #include "include/entity/Player.h"
 
+Player::Player() : Entity(player) {
+  vx_ = 0;
+  vy_ = 0;
+  facing_ = 1;
+  x_state_ = idle;
+  y_state_ = drifting;
+}
+
 void Player::PrepareJump() {
   switch (y_state_) {
     case on_ground:
@@ -65,4 +73,76 @@ std::istream &operator>>(std::istream &i, Player &p) {
   p.x_state_ = idle;
   p.y_state_ = drifting;
   return i;
+}
+
+void Player::PrepareLeft() {
+  switch (x_state_) {
+    case idle:
+      vx_ -= 2;
+      facing_ = 0;
+      move_cnt_ = 1;
+      x_state_ = moving;
+      break;
+    case moving:
+      if (facing_ == 0) {
+        if (move_cnt_ < 3) {
+          --vx_;
+          ++move_cnt_;
+        }
+      } else if (facing_ == 1) {
+        vx_ -= move_cnt_ + 1;
+        vx_ -= 2;
+        facing_ = 0;
+        move_cnt_ = 1;
+      }
+      break;
+    default:
+      break;
+  }
+}
+
+void Player::PrepareRight() {
+  switch (x_state_) {
+    case idle:
+      vx_ += 2;
+      facing_ = 1;
+      move_cnt_ = 1;
+      x_state_ = moving;
+      break;
+    case moving:
+      if (facing_ == 1) {
+        if (move_cnt_ < 3) {
+          ++vx_;
+          ++move_cnt_;
+        }
+      } else if (facing_ == 0) {
+        vx_ += move_cnt_ + 1;
+        vx_ += 2;
+        facing_ = 1;
+        move_cnt_ = 1;
+      }
+      break;
+    default:
+      break;
+  }
+}
+
+void Player::HorizontalIdle() {
+  switch (x_state_) {
+    case idle:
+      break;
+    case moving:
+      if (facing_ == 1) {
+        vx_ -= move_cnt_ + 1;
+        move_cnt_ = 0;
+        x_state_ = idle;
+      } else if (facing_ == 0) {
+        vx_ += move_cnt_ + 1;
+        move_cnt_ = 0;
+        x_state_ = idle;
+      }
+      break;
+    default:
+      break;
+  }
 }

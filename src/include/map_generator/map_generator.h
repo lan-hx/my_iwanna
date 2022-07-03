@@ -13,8 +13,8 @@ void GenerateTestMap() {
   Barrier block;
   HotArea pha;
   HotArea bha;
-  player.SetPos(0, 500);
-  block.SetPos(0, 524);
+  player.SetPos(150, 500);
+  block.SetPos(100, 524);
   player.SetWidth(24);
   player.SetHeight(24);
   block.SetWidth(240);
@@ -56,7 +56,7 @@ void GenerateTestMap() {
   size += 6;
   sprintf(s + size, "%8d", 30);
   size += 8;
-  FILE *fp = fopen("D:/my_iwanna/about/test_map4.map", "w");
+  FILE *fp = fopen("D:/my_iwanna/about/test_map5.map", "w");
   fwrite(s, 1, size, fp);
   fclose(fp);
 }

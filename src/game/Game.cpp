@@ -28,6 +28,8 @@ Game::Game() {
   key_command_map_[Qt::Key_Right] = "Right";
   key_command_map_[Qt::Key_Shift] = "Jump";
   key_command_map_[Qt::Key_Z] = "Shoot";
+  key_command_map_[Qt::Key_A] = "Left";
+  key_command_map_[Qt::Key_D] = "Right";
   command_state_["Left"] = 0;
   command_state_["Right"] = 0;
   command_state_["Jump"] = 0;
@@ -173,14 +175,15 @@ void Game::Step() {
   bool break_jump = false;
   bool land = false;
   //   bool shoot = command_state_["Shoot"];
-  if ((left ^ right) != 0) {
+  if ((left != 0) || (right != 0)) {
     if (left != 0) {
-      //   player->PrepareLeft();
-    } else {
-      //   player->PrepareRight();
+      player->PrepareLeft();
+    }
+    if (right != 0) {
+      player->PrepareRight();
     }
   } else {
-    // player->HorizontalIdle();
+    player->HorizontalIdle();
   }
   if ((jump & 4) != 0) {
     player->BreakJump();
@@ -200,17 +203,24 @@ void Game::Step() {
   int32_t dx = vx;
   int32_t dy = vy;
   player->Move();
+  int32_t collision_pos = 0;
   for (auto entity : entities_->GetEntitySet()) {
     if (entity->GetType() == EntityTypeId::barrier) {
       if (!entity->IsHidden()) {
         switch (Collide(*player, *entity)) {
           case 1:
             entity_set.emplace(entity);
-            interrupt_jump = true;
+            collision_pos |= 1;
             break;
           case 2:
+            collision_pos |= 2;
             entity_set.emplace(entity);
             land = true;
+            break;
+          case 3:
+            collision_pos |= 2;
+            entity_set.emplace(entity);
+            interrupt_jump = true;
             break;
           default:
             break;
@@ -223,26 +233,59 @@ void Game::Step() {
       dead_ = true;
       return;
     }
-    if (abs((dx - 1) * vy - vx * dy) < abs(dx * vy - vx * (dy - 1))) {
-      if (vx > 0) {
-        player->MoveByX(-1);
-        --dx;
+    if (collision_pos == 3) {
+      if (abs((abs(dx) - 1) * abs(vy) - abs(vx) * abs(dy)) < abs(abs(dx) * abs(vy) - abs(vx) * (abs(dy) - 1))) {
+        if (vx > 0) {
+          player->MoveByX(-1);
+          --dx;
+        } else {
+          player->MoveByX(1);
+          ++dx;
+        }
       } else {
-        player->MoveByX(1);
-        ++dx;
+        if (vy > 0) {
+          player->MoveByY(-1);
+          --dy;
+        } else {
+          player->MoveByY(1);
+          ++dy;
+        }
       }
     } else {
-      if (vy > 0) {
-        player->MoveByY(-1);
-        --dy;
-      } else {
-        player->MoveByY(1);
-        ++dy;
+      if (collision_pos == 1) {
+        if (vx > 0) {
+          player->MoveByX(-1);
+          --dx;
+        } else {
+          player->MoveByX(1);
+          ++dx;
+        }
+      }
+      if (collision_pos == 2) {
+        if (vy > 0) {
+          player->MoveByY(-1);
+          --dy;
+        } else {
+          player->MoveByY(1);
+          ++dy;
+        }
       }
     }
+    collision_pos = 0;
     for (auto entity : entity_set) {
-      if (Collide(*player, *entity) == 0) {
-        entity_set.erase(entity);
+      switch (Collide(*player, *entity)) {
+        case 0:
+          entity_set.erase(entity);
+          break;
+        case 1:
+          collision_pos |= 1;
+          break;
+        case 2:
+        case 3:
+          collision_pos |= 2;
+          break;
+        default:
+          break;
       }
     }
   }
@@ -274,6 +317,9 @@ int32_t Collide(const Entity &en1, const Entity &en2) {
           (en2.GetY() + ha2.GetY(1) > miny)) {
         if (maxy < en2.GetY() + ha2.GetY(1)) {
           return 2;
+        }
+        if (miny > en2.GetY() + ha2.GetY(0)) {
+          return 3;
         }
         return 1;
       }

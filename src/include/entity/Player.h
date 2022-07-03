@@ -13,7 +13,7 @@
 
 class Player : public Entity {
  public:
-  explicit Player() : Entity(player) {}
+  explicit Player();
   inline void SetVx(int32_t vx) { vx_ = vx; }
   inline void SetVy(int32_t vy) { vy_ = vy; }
   inline void SetXState(XState state) { x_state_ = state; }
@@ -47,6 +47,7 @@ class Player : public Entity {
   XState x_state_;
   YState y_state_;
   int32_t jump_cnt_;
+  int32_t move_cnt_;
 };
 
 std::istream &operator>>(std::istream &i, Player &p);

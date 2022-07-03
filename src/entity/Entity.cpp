@@ -18,7 +18,7 @@ std::istream &operator>>(std::istream &i, Entity &e) {
   i >> e.entity_id_ >> e.x_ >> e.y_;
   i >> e.hot_area_;
   i >> e.hidden_ >> e.display_priority_ >> e.refresh_rate_ >> e.state_num_;
-  for (int j = 0; j < e.state_num_; ++j) {
+  for (int32_t j = 0; j < e.state_num_; ++j) {
     i >> str_len;
     // auto str = new char[str_len + 1];
     // i.read(str, str_len);
@@ -63,8 +63,8 @@ int32_t Entity::SerializeTo(char *str) {
   size += 8;
   sprintf(str + size, "%8d", state_num_);
   size += 8;
-  for (int i = 0; i < state_num_; ++i) {
-    int len = state_pics_[i].length();
+  for (int32_t i = 0; i < state_num_; ++i) {
+    int32_t len = static_cast<int32_t>(state_pics_[i].length());
     sprintf(str + size, "%8d", len);
     size += 8;
     sprintf(str + size, " %s", state_pics_[i].c_str());

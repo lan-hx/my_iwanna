@@ -43,7 +43,7 @@ class Entity {
   inline void SetWidth(const int32_t &w) { width_ = w; }
   inline void SetHeight(const int32_t &h) { height_ = h; }
   inline void SetStateNum(const int32_t &num) { state_num_ = num; }
-  inline void AddStatePic(char *pic) { ++state_num_, state_pics_.emplace_back(pic); }
+  inline void AddStatePic(const char *pic) { ++state_num_, state_pics_.emplace_back(pic); }
   inline int32_t GetEntityId() const { return entity_id_; }
 
   int32_t SerializeTo(char *str);
