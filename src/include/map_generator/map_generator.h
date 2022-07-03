@@ -36,7 +36,11 @@ void GenerateTestMap() {
   player.SetRefreshRate(1);
   block.SetRefreshRate(1);
   player.SetStateNum(0);
+  player.AddStatePic(":/hero/eastIdle.gif");
+  player.SetCurState(0);
   block.SetStateNum(0);
+  block.AddStatePic(":/platforms/platform1.png");
+  block.SetCurState(0);
   player.SetDrawType(tiled);
   block.SetDrawType(tiled);
   int size = 0;
@@ -48,8 +52,8 @@ void GenerateTestMap() {
   size += block.SerializeTo(s + size);
   sprintf(s + size, "%8d", 5);
   size += 8;
-  sprintf(s + size, "   a.png");
-  size += 8;
+  sprintf(s + size, " a.png");
+  size += 6;
   sprintf(s + size, "%8d", 30);
   size += 8;
   FILE *fp = fopen("D:/my_iwanna/about/test_map4.map", "w");

@@ -24,7 +24,7 @@ class Entity {
   inline void MoveTo(const int32_t &x, const int32_t &y) { x_ = x, y_ = y; }
   int32_t Load(const char *);
   inline bool IsHidden() const { return hidden_ != 0; }
-  const char *GetCurPic() const { return state_pics_[cur_state_]; }
+  const char *GetCurPic() const { return state_pics_[cur_state_].c_str(); }
   int32_t GetCurState() const { return cur_state_; }
   int32_t GetDisplayPriority() const { return display_priority_; }
   inline const HotArea &GetHotArea() const { return hot_area_; }
@@ -59,7 +59,7 @@ class Entity {
   int32_t hidden_;
   int32_t display_priority_;
   int32_t state_num_;
-  std::vector<char *> state_pics_;
+  std::vector<std::string> state_pics_;
   int32_t cur_state_;
   int32_t refresh_rate_;
   int32_t width_;

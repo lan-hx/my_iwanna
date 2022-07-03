@@ -10,11 +10,7 @@ int32_t Entity::entity_id_cnt = 0;
 
 Entity::Entity(EntityTypeId type) : type_(type) { entity_id_ = entity_id_cnt++; }
 
-Entity::~Entity() {
-  for (auto pic : state_pics_) {
-    delete[] pic;
-  }
-}
+Entity::~Entity() = default;
 
 std::istream &operator>>(std::istream &i, Entity &e) {
   int32_t str_len;
@@ -24,8 +20,11 @@ std::istream &operator>>(std::istream &i, Entity &e) {
   i >> e.hidden_ >> e.display_priority_ >> e.refresh_rate_ >> e.state_num_;
   for (int j = 0; j < e.state_num_; ++j) {
     i >> str_len;
-    auto str = new char[str_len + 1];
-    i.read(str, str_len);
+    // auto str = new char[str_len + 1];
+    // i.read(str, str_len);
+    std::string str;
+    i >> str;
+    // str[str_len] = '\0';
     e.state_pics_.emplace_back(str);
   }
   i >> e.width_ >> e.height_ >> draw_type;
@@ -65,10 +64,10 @@ int32_t Entity::SerializeTo(char *str) {
   sprintf(str + size, "%8d", state_num_);
   size += 8;
   for (int i = 0; i < state_num_; ++i) {
-    int len = strlen(state_pics_[i]);
+    int len = state_pics_[i].length();
     sprintf(str + size, "%8d", len);
     size += 8;
-    sprintf(str + size, " %s", state_pics_[i]);
+    sprintf(str + size, " %s", state_pics_[i].c_str());
     size += len + 1;
   }
   sprintf(str + size, "%8d", width_);
