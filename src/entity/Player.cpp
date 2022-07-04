@@ -38,6 +38,7 @@ void Player::PrepareJump() {
       break;
     case drifting:
       vy_ = -6;
+      jump_cnt_ = 1;
       y_state_ = second_jump_begin;
     default:
       break;

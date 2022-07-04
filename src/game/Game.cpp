@@ -110,7 +110,7 @@ int32_t Game::Load(const char *file_name) {
   return 1;
 }
 
-void Game::Reset() {
+void Game::CloseMap() {
   dead_ = false;
   death_cnt_ = 0;
   step_cnt_ = 0LL;
@@ -118,14 +118,8 @@ void Game::Reset() {
   delete entities_;
   entities_ = nullptr;
   background_pic_.clear();
-  background_pic_ = nullptr;
   in_game_ = false;
   frame_rate_ = 60;
-}
-
-int32_t Game::ResetAndLoad(const char *file) {
-  Reset();
-  return Load(file);
 }
 
 void Game::Event(const Qt::Key &key, bool is_pressed) {
@@ -281,7 +275,7 @@ void Game::Step() {
             // case 5:
             // case 7:
             entity_set.emplace(entity);
-            interrupt_jump = true;
+            // interrupt_jump = true;
             break;
           // case 2:
           //   collision_pos |= 2;

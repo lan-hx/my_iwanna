@@ -11,8 +11,8 @@
 #include "common/common.h"
 #include "entity/Entity.h"
 
-#define FIRST_JUMP_CNT_MAX 9
-#define SECOND_JUMP_CNT_MAX 4
+#define FIRST_JUMP_CNT_MAX 13
+#define SECOND_JUMP_CNT_MAX 7
 #define MOVE_CNT_MAX 3
 
 class Player : public Entity {
