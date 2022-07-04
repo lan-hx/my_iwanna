@@ -8,6 +8,7 @@
 #include <QPainter>
 #include <QPixmap>
 
+#include "entity/Entity.h"
 #include "ui_gameui.h"
 
 GameUI::GameUI(QWidget *parent) : QWidget(parent), ui(new Ui::GameUI), timer_(new QTimer(this)) {
