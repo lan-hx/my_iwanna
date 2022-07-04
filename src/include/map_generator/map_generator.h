@@ -27,7 +27,14 @@ void GenerateTestMap() {
   player.SetDisplayPriority(0);
   player.SetRefreshRate(1);
   player.SetStateNum(0);
+  player.AddStatePic(":/hero/eastFall.png");
   player.AddStatePic(":/hero/eastIdle.gif");
+  player.AddStatePic(":/hero/eastJump.png");
+  player.AddStatePic(":/hero/eastMoving.gif");
+  player.AddStatePic(":/hero/westFall.png");
+  player.AddStatePic(":/hero/westIdle.gif");
+  player.AddStatePic(":/hero/westJump.png");
+  player.AddStatePic(":/hero/westMoving.gif");
   player.SetCurState(0);
   player.SetDrawType(tiled);
   block.SetPos(100, 324);
@@ -74,7 +81,7 @@ void GenerateTestMap() {
   size += 6;
   sprintf(s + size, "%8d", 40);
   size += 8;
-  FILE *fp = fopen("D:/my_iwanna/about/test_map6.map", "w");
+  FILE *fp = fopen("D:/my_iwanna/about/test_map7.map", "w");
   fwrite(s, 1, size, fp);
   fclose(fp);
 }

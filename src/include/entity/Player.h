@@ -38,9 +38,8 @@ class Player : public Entity {
   inline int32_t GetVy() const { return vy_; }
   inline XState GetXState() const { return x_state_; }
   inline YState GetYState() const { return y_state_; }
-  // facing_ = 0 : facing left
-  // facing_ = 1 : facing right
-  int32_t GetFacing();
+  // facing_ = 0 : facing left; facing_ = 1 : facing right
+  inline int32_t GetFacing() const { return facing_; }
 
   friend std::istream &operator>>(std::istream &i, Player &p);
 

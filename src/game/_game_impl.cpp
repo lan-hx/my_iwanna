@@ -168,6 +168,13 @@ void _game_impl::Step() {
   //         similar
   ++step_cnt_;
   Player *player = entities_->GetPlayer();
+  for (auto entity : entities_->GetEntitySet()) {
+    if (entity->GetType() != EntityTypeId::player) {
+      if ((step_cnt_ % entity->GetRefreshRate()) == 0) {
+        entity->SetCurState((entity->GetCurState() + 1) % entity->GetStateNum());
+      }
+    }
+  }
   std::unordered_set<Entity *> entity_set;
   int32_t left = command_state_["Left"];
   int32_t right = command_state_["Right"];
@@ -331,6 +338,40 @@ void _game_impl::Step() {
       }
     }
   }
+
+  switch (player->GetYState()) {
+    case on_ground:
+    case landed:
+      if (player->GetXState() == idle) {
+        if (player->GetFacing() == 1) {
+          player->SetCurState(1);
+        } else {
+          player->SetCurState(5);
+        }
+      } else {
+        if (player->GetFacing() == 1) {
+          player->SetCurState(3);
+        } else {
+          player->SetCurState(7);
+        }
+      }
+      break;
+    default:
+      if (player->GetVy() < 0) {
+        if (player->GetFacing() == 1) {
+          player->SetCurState(2);
+        } else {
+          player->SetCurState(6);
+        }
+      } else {
+        if (player->GetFacing() == 1) {
+          player->SetCurState(0);
+        } else {
+          player->SetCurState(4);
+        }
+      }
+  }
+
   command_state_["Jump"] = command_state_["Jump"] & 1;
 }
 

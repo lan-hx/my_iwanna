@@ -33,6 +33,7 @@ class Entity {
   inline DrawType GetDrawType() const { return draw_type_; }
   inline int32_t GetWidth() const { return width_; }
   inline int32_t GetHeight() const { return height_; }
+  inline int32_t GetStateNum() const { return state_num_; }
   void SetHidden(bool hidden) { hidden_ = hidden ? 1 : 0; }
   inline void SetCurState(const int32_t &state) { cur_state_ = state; }
   inline void SetDisplayPriority(const int32_t &priority) { display_priority_ = priority; }
