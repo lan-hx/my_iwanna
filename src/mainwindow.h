@@ -33,6 +33,7 @@ class MainWindow : public QMainWindow {
 
  signals:
   void Pause();
+  void Restart();
   void SendKey(QKeyEvent *event, bool is_pressed);
 };
 

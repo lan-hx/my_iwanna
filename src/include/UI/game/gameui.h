@@ -26,6 +26,7 @@ class GameUI : public QWidget {
   void Pause();
   void Continue();
   void SendKey(QKeyEvent *event, bool is_pressed);
+  void Restart();
 
  private:
   Ui::GameUI *ui;  // NOLINT
@@ -35,6 +36,7 @@ class GameUI : public QWidget {
   int64_t elasped_time_nsec_;
   int32_t timer_time_;
   std::unordered_map<int32_t, QLabel *> gifs_;
+  QLabel *death_cover_;
 
  protected:
   void paintEvent(QPaintEvent *event) override;

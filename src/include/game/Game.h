@@ -7,6 +7,7 @@
 
 #include <Qt>
 #include <cstdint>
+#include <vector>
 
 class _game_impl;
 class Entity;
@@ -16,7 +17,7 @@ class Game {
   explicit Game();
   ~Game();
   int32_t Load(const char *file_name);
-  void Reset();
+  void Restart();
   void Event(const Qt::Key &key, bool is_pressed);
   void Step();
   void CloseMap();

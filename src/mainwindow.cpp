@@ -26,7 +26,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
   game_ui_ = new GameUI(this);
   setCentralWidget(game_ui_);
-  game_ui_->setFixedSize(800, 600);
   adjustSize();
 
   connect(game_ui_, &GameUI::UpdateInfo,
@@ -63,6 +62,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   });
   connect(ui->actionexit, &QAction::triggered, [&]() { close(); });
   connect(this, &MainWindow::SendKey, game_ui_, &GameUI::SendKey);
+  connect(this, &MainWindow::Restart, game_ui_, &GameUI::Restart);
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -72,6 +72,8 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
     case Qt::Key_P:
       emit Pause();
       break;
+    case Qt::Key_R:
+      emit Restart();
     default:
       emit SendKey(event, true);
   }
