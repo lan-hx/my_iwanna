@@ -18,10 +18,7 @@ void Game::CloseMap() { game_impl_->CloseMap(); }
 bool Game::InGame() const { return game_impl_->InGame(); }
 int32_t Game::GetFrameRate() { return game_impl_->GetFrameRate(); }
 std::vector<Entity *> Game::GetEntitySet() const { return game_impl_->GetEntitySet(); }
-const char *Game::GetBackgroundPic() const {
-  // todo: not implemented
-  return nullptr;
-}
+const char *Game::GetBackgroundPic() const { return game_impl_->GetBackgroundPic(); }
 bool Game::IsDead() const { return game_impl_->IsDead(); }
 int32_t Game::DeathCount() { return game_impl_->DeathCount(); }
 double Game::PlayTime() const { return game_impl_->PlayTime(); }

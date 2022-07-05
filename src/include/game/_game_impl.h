@@ -29,7 +29,7 @@ class _game_impl {
   inline int32_t GetFrameRate() const { return frame_rate_; }
   void SetFrameRate(int32_t);
   std::vector<Entity *> GetEntitySet() const;
-  const char *GetBackgroundPic() const;
+  const char *GetBackgroundPic() const { return background_pic_.empty() ? nullptr : background_pic_.c_str(); }
   inline bool IsDead() const { return dead_; }
   inline int32_t DeathCount() const { return death_cnt_; }
   inline double PlayTime() const { return static_cast<double>(step_cnt_) / static_cast<double>(frame_rate_); }

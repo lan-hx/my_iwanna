@@ -91,7 +91,7 @@ void GameUI::paintEvent([[maybe_unused]] QPaintEvent *event) {
     if (game_.GetBackgroundPic() != nullptr) {
       bool ret = pixmap.load(game_.GetBackgroundPic());
       if (!ret) {
-        QMessageBox::warning(this, "图片加载失败", "图片加载失败！");
+        // QMessageBox::warning(this, "图片加载失败", "图片加载失败！");
       }
       painter.drawPixmap(0, 0, width(), height(), pixmap);
     } else {

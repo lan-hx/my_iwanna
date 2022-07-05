@@ -6,22 +6,25 @@
 #include "entity/Barrier.h"
 #include "entity/Entity.h"
 #include "entity/Player.h"
+#include "entity/Trap.h"
 
 void GenerateTestMap() {
   char s[10000];
   Player player;
   Barrier block;
   Barrier block2;
+  Trap trap;
   HotArea pha;
   HotArea bha;
   HotArea bha2;
-  player.SetPos(150, 300);
+  HotArea tha;
+  player.SetPos(150, 250);
   player.SetWidth(25);
   player.SetHeight(21);
   pha.SetType(rectangular);
   pha.SetPointNum(2);
-  pha.AddPoint(0, 0);
-  pha.AddPoint(25, 21);
+  pha.AddPoint(2, 0);
+  pha.AddPoint(23, 21);
   player.SetHotArea(pha);
   player.SetHidden(false);
   player.SetDisplayPriority(0);
@@ -37,7 +40,7 @@ void GenerateTestMap() {
   player.AddStatePic(":/hero/westMoving.gif");
   player.SetCurState(0);
   player.SetDrawType(tiled);
-  block.SetPos(100, 324);
+  block.SetPos(100, 400);
   block.SetWidth(400);
   block.SetHeight(100);
   bha.SetType(rectangular);
@@ -67,21 +70,36 @@ void GenerateTestMap() {
   block2.AddStatePic(":/platforms/platform1.png");
   block2.SetCurState(0);
   block2.SetDrawType(tiled);
+  trap.SetPos(200, 372);
+  trap.SetWidth(28);
+  trap.SetHeight(28);
+  tha.SetType(triangular);
+  tha.SetPointNum(3);
+  tha.AddPoint(14, 0);
+  tha.AddPoint(0, 28);
+  tha.AddPoint(28, 28);
+  trap.SetHotArea(tha);
+  trap.SetHidden(false);
+  trap.SetDisplayPriority(2);
+  trap.SetRefreshRate(1);
+  trap.SetStateNum(0);
+  trap.AddStatePic(":/platforms/trap1.gif");
+  trap.SetCurState(0);
+  trap.SetDrawType(scaled);
   int size = 0;
   sprintf(s, "%8d", -1);
   size += 8;
-  sprintf(s + size, "%8d", 3);
+  sprintf(s + size, "%8d", 4);
   size += 8;
   size += player.SerializeTo(s + size);
   size += block.SerializeTo(s + size);
   size += block2.SerializeTo(s + size);
-  sprintf(s + size, "%8d", 5);
+  size += trap.SerializeTo(s + size);
+  sprintf(s + size, "%8d", 0);
   size += 8;
-  sprintf(s + size, " a.png");
-  size += 6;
   sprintf(s + size, "%8d", 40);
   size += 8;
-  FILE *fp = fopen("D:/my_iwanna/about/test_map7.map", "w");
+  FILE *fp = fopen("D:/my_iwanna/about/test_map8.map", "w");
   fwrite(s, 1, size, fp);
   fclose(fp);
 }
