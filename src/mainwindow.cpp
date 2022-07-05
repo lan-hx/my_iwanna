@@ -74,6 +74,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
       break;
     case Qt::Key_R:
       emit Restart();
+      break;
     default:
       emit SendKey(event, true);
   }

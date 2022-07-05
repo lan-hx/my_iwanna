@@ -82,7 +82,7 @@ GameUI::GameUI(QWidget *parent)
   //  l4->move(250, 100);
 }
 
-void GameUI::paintEvent(QPaintEvent *event) {
+void GameUI::paintEvent([[maybe_unused]] QPaintEvent *event) {
   QPainter painter(this);
   QPixmap pixmap;
   QBrush brush;
