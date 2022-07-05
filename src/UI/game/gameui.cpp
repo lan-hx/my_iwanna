@@ -15,7 +15,8 @@ GameUI::GameUI(QWidget *parent)
     : QWidget(parent), ui(new Ui::GameUI), timer_(new QTimer(this)), death_cover_(new QLabel(this)) {
   ui->setupUi(this);
   setFixedSize(800, 600);
-  connect(timer_, &QTimer::timeout, [&]() {
+  connect(timer_, &QTimer::timeout, this, &GameUI::Step);
+  connect(this, &GameUI::Step, [&]() {
     if (game_.InGame()) {
       game_.Step();
       auto entity = game_.GetPlayer();
@@ -151,10 +152,32 @@ void GameUI::Stop() {
   }
   gifs_.clear();
 }
-void GameUI::Pause() { timer_->stop(); }
-void GameUI::Continue() { timer_->start(); }
+void GameUI::Pause() {
+  timer_->stop();
+  for (auto &gif : gifs_) {
+    gif.second->movie()->stop();
+  }
+}
+void GameUI::Continue() {
+  timer_->start();
+  for (auto &gif : gifs_) {
+    gif.second->movie()->start();
+  }
+}
 void GameUI::SendKey(QKeyEvent *event, bool is_pressed) {
   auto key = event->key();
+  //  emit UpdateInfo(0, 0, 0, (QString::number(key) + QString::number(is_pressed)).toUtf8().data());
+  //  qDebug() << key << is_pressed;
+  if (key == Qt::Key_T && is_pressed) {
+    tas_ = !tas_;
+    if (tas_) {
+      timer_->stop();
+    } else {
+      timer_->start();
+    }
+  } else if (key == Qt::Key_Alt && is_pressed) {
+    emit Step();
+  }
   game_.Event(static_cast<Qt::Key>(key), is_pressed);
 }
 void GameUI::Restart() {

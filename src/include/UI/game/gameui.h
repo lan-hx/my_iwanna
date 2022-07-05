@@ -37,12 +37,15 @@ class GameUI : public QWidget {
   int32_t timer_time_;
   std::unordered_map<int32_t, QLabel *> gifs_;
   QLabel *death_cover_;
+  bool tas_ = false;
+  bool tas_step_ = false;
 
  protected:
   void paintEvent(QPaintEvent *event) override;
 
  signals:
   void UpdateInfo(int64_t nsec, int32_t death_count, double play_time, const char *debug_info);  // NOLINT
+  void Step();
 };
 
 #endif  // GAMEUI_H
