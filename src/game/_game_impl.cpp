@@ -54,6 +54,7 @@ int32_t _game_impl::Load(const char *file_name) {
     in_game_ = false;
     return 1;
   }
+  cur_map_ = file_name;
   int32_t file_size;
   int32_t entity_num;
   int32_t entity_size;
@@ -122,12 +123,19 @@ void _game_impl::CloseMap() {
   dead_ = false;
   death_cnt_ = 0;
   step_cnt_ = 0LL;
+  cur_map_.clear();
   entities_->Destroy();
   delete entities_;
   entities_ = nullptr;
   background_pic_.clear();
   in_game_ = false;
   frame_rate_ = 60;
+}
+
+void _game_impl::Restart() {
+  std::string cur_map = cur_map_;
+  CloseMap();
+  Load(cur_map.c_str());
 }
 
 void _game_impl::Event(const Qt::Key &key, bool is_pressed) {
