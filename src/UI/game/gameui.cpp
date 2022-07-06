@@ -16,7 +16,7 @@ GameUI::GameUI(QWidget *parent)
       ui(new Ui::GameUI),
       view_model_(this, this),
       timer_(new QTimer(this)),
-      death_cover_(new QLabel(this))
+      death_cover_(new QLabel(this)),
       bgm_(nullptr),
       sound_(nullptr) {
   ui->setupUi(this);
@@ -173,4 +173,11 @@ void GameUI::AfterLoad(int32_t ret) {
   bgm_ = new QSound("music/bgmusic1.wav", this);
   bgm_->play();
   emit LoadResult(ret);
+}
+
+void GameUI::DieHandle() {
+  delete bgm_;
+  bgm_ = new QSound("music/death.wav", this);
+  bgm_->play();
+  Pause();
 }

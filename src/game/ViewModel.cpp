@@ -14,7 +14,7 @@ ViewModel::ViewModel(QObject *parent, GameUI *game_ui) : QObject(parent), game_i
     }
   });
   connect(game_impl_, &Game::StepCallBack, game_ui_, &GameUI::UpdateMovies);
-  connect(game_impl_, &Game::DieSignal, game_ui_, &GameUI::Pause);
+  connect(game_impl_, &Game::DieSignal, game_ui_, &GameUI::DieHandle);
   connect(game_impl_, &Game::UpdateInfo, game_ui_, &GameUI::UpdateInfoFromGame);
   connect(game_impl_, &Game::UpdateFrame, game_ui_, [&]() { game_ui_->update(); });
   connect(game_ui_, &GameUI::LoadSignal, game_impl_, &Game::Load);
