@@ -36,10 +36,19 @@ class _game_impl {
   Player *GetPlayer() { return entities_->GetPlayer(); }
 
  private:
+  void Die();
+  void Save();
+  void Init();
+
   bool dead_ = false;
   int32_t death_cnt_ = 0;
   int64_t step_cnt_ = 0LL;
   std::string cur_map_;
+  std::string left_map_;
+  std::string right_map_;
+  std::string up_map_;
+  std::string down_map_;
+  int32_t cur_resurrection_;
   EntitySet *entities_;
   std::string background_pic_;
   bool in_game_ = false;
