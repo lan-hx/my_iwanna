@@ -4,7 +4,7 @@
 #include <QElapsedTimer>
 #include <QKeyEvent>
 #include <QLabel>
-#include <QSound>
+#include <QSoundEffect>
 #include <QTimer>
 #include <QWidget>
 #include <cstdint>
@@ -42,8 +42,9 @@ class GameUI : public QWidget {
   int32_t timer_time_;
   std::unordered_map<int32_t, QLabel *> gifs_;
   QLabel *death_cover_;
-  QSound *bgm_;
-  QSound *sound_;
+  QSoundEffect *bgm_;
+  QSoundEffect *death_sound_;
+  QSoundEffect *sound_;
 
  protected:
   void paintEvent(QPaintEvent *event) override;
