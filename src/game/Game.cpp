@@ -417,28 +417,32 @@ void Game::Step() {
 
   if (player->GetY() < 0) {
     if (!up_map_.empty()) {
-      Load(up_map_.c_str());
+      Load(GeneratePath(cur_map_, up_map_).c_str());
+      player->MoveTo(player->GetX(), player->GetY() + 600);
     } else {
       player->MoveTo(player->GetX(), 0);
     }
   }
   if (player->GetY() >= 600) {
     if (!down_map_.empty()) {
-      Load(down_map_.c_str());
+      Load(GeneratePath(cur_map_, down_map_).c_str());
+      player->MoveTo(player->GetX(), player->GetY() - 600);
     } else {
       player->MoveTo(player->GetX(), 599);
     }
   }
   if (player->GetX() < 0) {
     if (!left_map_.empty()) {
-      Load(left_map_.c_str());
+      Load(GeneratePath(cur_map_, left_map_).c_str());
+      player->MoveTo(player->GetX() + 800, player->GetY());
     } else {
       player->MoveTo(0, player->GetY());
     }
   }
   if (player->GetX() >= 800) {
     if (!right_map_.empty()) {
-      Load(right_map_.c_str());
+      Load(GeneratePath(cur_map_, right_map_).c_str());
+      player->MoveTo(player->GetX() - 800, player->GetY());
     } else {
       player->MoveTo(799, player->GetY());
     }
