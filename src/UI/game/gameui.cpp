@@ -12,41 +12,14 @@
 #include "ui_gameui.h"
 
 GameUI::GameUI(QWidget *parent)
-    : QWidget(parent), ui(new Ui::GameUI), timer_(new QTimer(this)), death_cover_(new QLabel(this)) {
+    : QWidget(parent),
+      ui(new Ui::GameUI),
+      view_model_(this, this),
+      timer_(new QTimer(this)),
+      death_cover_(new QLabel(this)) {
   ui->setupUi(this);
   setFixedSize(800, 600);
-  connect(timer_, &QTimer::timeout, [&]() {
-    if (game_.InGame()) {
-      game_.Step();
-      auto entity = game_.GetPlayer();
-      if (!gifs_.contains(entity->GetEntityId())) {
-        // brand new gif
-        QLabel *label = new QLabel(this);
-        QMovie *movie = new QMovie(label);
-        movie->setFileName(entity->GetCurPic());
-        label->setMovie(movie);
-        movie->start();
-        label->show();
-        gifs_.emplace(entity->GetEntityId(), label);
-      } else if (gifs_[entity->GetEntityId()]->movie()->fileName() != entity->GetCurPic()) {
-        // gif changed
-        delete gifs_[entity->GetEntityId()];
-        QLabel *label = new QLabel(this);
-        QMovie *movie = new QMovie(label);
-        movie->setFileName(entity->GetCurPic());
-        label->setMovie(movie);
-        movie->start();
-        label->show();
-        gifs_[entity->GetEntityId()] = label;
-      }
-      if (game_.IsDead()) {
-        Pause();
-      }
-      emit UpdateInfo(time_.nsecsElapsed(), game_.DeathCount(), game_.PlayTime(), game_.GetDebugOutput());
-      time_.restart();
-    }
-    update();
-  });
+  connect(timer_, &QTimer::timeout, [&]() { emit StepSignal(); });
   timer_->setTimerType(Qt::PreciseTimer);
 
   // dead
@@ -87,9 +60,9 @@ void GameUI::paintEvent([[maybe_unused]] QPaintEvent *event) {
   QPixmap pixmap;
   QBrush brush;
 
-  if (game_.InGame()) {
-    if (game_.GetBackgroundPic() != nullptr) {
-      bool ret = pixmap.load(game_.GetBackgroundPic());
+  if (view_model_.InGame()) {
+    if (view_model_.GetBackgroundPic() != nullptr) {
+      bool ret = pixmap.load(view_model_.GetBackgroundPic());
       if (!ret) {
         // QMessageBox::warning(this, "图片加载失败", "图片加载失败！");
       }
@@ -101,7 +74,7 @@ void GameUI::paintEvent([[maybe_unused]] QPaintEvent *event) {
       painter.setPen(Qt::transparent);
       painter.drawRect(0, 0, 799, 599);
     }
-    for (const auto &entity : game_.GetEntitySet()) {
+    for (const auto &entity : view_model_.GetEntitySet()) {
       if (entity->GetType() == player) {
         if (gifs_.contains(entity->GetEntityId())) {
           gifs_[entity->GetEntityId()]->move(entity->GetX(), entity->GetY());
@@ -120,7 +93,7 @@ void GameUI::paintEvent([[maybe_unused]] QPaintEvent *event) {
         }
       }
     }
-    if (game_.IsDead()) {
+    if (view_model_.IsDead()) {
       death_cover_->show();
     } else {
       death_cover_->hide();
@@ -137,15 +110,10 @@ void GameUI::paintEvent([[maybe_unused]] QPaintEvent *event) {
 
 GameUI::~GameUI() { delete ui; }
 
-int32_t GameUI::Load(const char *file_name) {
-  auto ret = game_.Load(file_name);
-  timer_->setInterval(1000 / game_.GetFrameRate());
-  timer_->start();
-  return ret;
-}
+void GameUI::Load(const char *file_name) { emit LoadSignal(file_name); }
 void GameUI::Stop() {
   timer_->stop();
-  game_.CloseMap();
+  emit CloseMapSignal();
   for (auto &gif : gifs_) {
     delete gif.second;
   }
@@ -155,9 +123,42 @@ void GameUI::Pause() { timer_->stop(); }
 void GameUI::Continue() { timer_->start(); }
 void GameUI::SendKey(QKeyEvent *event, bool is_pressed) {
   auto key = event->key();
-  game_.Event(static_cast<Qt::Key>(key), is_pressed);
+  emit KeyEventSignal(static_cast<Qt::Key>(key), is_pressed);
 }
 void GameUI::Restart() {
-  game_.Restart();
+  emit RestartSignal();
   Continue();
+}
+void GameUI::UpdateMovies() {
+  auto entity = view_model_.GetPlayer();
+  if (!gifs_.contains(entity->GetEntityId())) {
+    // brand new gif
+    QLabel *label = new QLabel(this);
+    QMovie *movie = new QMovie(label);
+    movie->setFileName(entity->GetCurPic());
+    label->setMovie(movie);
+    movie->start();
+    label->show();
+    gifs_.emplace(entity->GetEntityId(), label);
+  } else if (gifs_[entity->GetEntityId()]->movie()->fileName() != entity->GetCurPic()) {
+    // gif changed
+    delete gifs_[entity->GetEntityId()];
+    QLabel *label = new QLabel(this);
+    QMovie *movie = new QMovie(label);
+    movie->setFileName(entity->GetCurPic());
+    label->setMovie(movie);
+    movie->start();
+    label->show();
+    gifs_[entity->GetEntityId()] = label;
+  }
+}
+void GameUI::UpdateInfoFromGame(int32_t death_count, double play_time, const char *debug_info) {
+  emit UpdateInfo(time_.nsecsElapsed(), death_count, play_time, debug_info);
+  time_.restart();
+}
+
+void GameUI::AfterLoad(int32_t ret) {
+  timer_->setInterval(1000 / view_model_.GetFrameRate());
+  timer_->start();
+  emit LoadResult(ret);
 }
