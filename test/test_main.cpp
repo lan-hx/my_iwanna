@@ -43,7 +43,6 @@
 //}
 TEST(Jumptest, Gametest){
   Game game;
-  game.Reset();
   game.Load("test_map4.map");
   Qt::Key key = Qt::Key_Shift;
   Player* player  = reinterpret_cast<Player*>((game.GetEntitySet())[0]);
