@@ -12,7 +12,12 @@
 #include "ui_gameui.h"
 
 GameUI::GameUI(QWidget *parent)
-    : QWidget(parent), ui(new Ui::GameUI), timer_(new QTimer(this)), death_cover_(new QLabel(this)) {
+    : QWidget(parent),
+      ui(new Ui::GameUI),
+      timer_(new QTimer(this)),
+      death_cover_(new QLabel(this)),
+      bgm_(nullptr),
+      sound_(nullptr) {
   ui->setupUi(this);
   setFixedSize(800, 600);
   connect(timer_, &QTimer::timeout, [&]() {
@@ -41,6 +46,9 @@ GameUI::GameUI(QWidget *parent)
       }
       if (game_.IsDead()) {
         Pause();
+        delete bgm_;
+        bgm_ = new QSound("music/death.wav", this);
+        bgm_->play();
       }
       emit UpdateInfo(time_.nsecsElapsed(), game_.DeathCount(), game_.PlayTime(), game_.GetDebugOutput());
       time_.restart();
@@ -54,6 +62,8 @@ GameUI::GameUI(QWidget *parent)
   death_cover_->setPixmap(gameover);
   death_cover_->move((width() - gameover.width()) / 2, (height() - gameover.height()) / 2);
   death_cover_->hide();
+
+  // music
 
   // debug
   //  QLabel *l1 = new QLabel(this);
@@ -141,6 +151,9 @@ int32_t GameUI::Load(const char *file_name) {
   auto ret = game_.Load(file_name);
   timer_->setInterval(1000 / game_.GetFrameRate());
   timer_->start();
+  delete bgm_;
+  bgm_ = new QSound("music/bgmusic1.wav", this);
+  bgm_->play();
   return ret;
 }
 void GameUI::Stop() {
@@ -150,6 +163,8 @@ void GameUI::Stop() {
     delete gif.second;
   }
   gifs_.clear();
+  delete bgm_;
+  bgm_ = nullptr;
 }
 void GameUI::Pause() { timer_->stop(); }
 void GameUI::Continue() { timer_->start(); }
@@ -159,5 +174,8 @@ void GameUI::SendKey(QKeyEvent *event, bool is_pressed) {
 }
 void GameUI::Restart() {
   game_.Restart();
+  delete bgm_;
+  bgm_ = new QSound("music/bgmusic1.wav", this);
+  bgm_->play();
   Continue();
 }
