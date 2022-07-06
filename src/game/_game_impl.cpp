@@ -14,13 +14,6 @@
 #include <unordered_set>
 #include <vector>
 
-#include "common/common.h"
-#include "entity/Barrier.h"
-#include "entity/Player.h"
-#include "entity/Portal.h"
-#include "entity/Trap.h"
-#include "hotarea/HotArea.h"
-
 std::vector<Entity *> _game_impl::GetEntitySet() const { return entities_->GetEntitySet(); }
 
 _game_impl::_game_impl() {
@@ -415,28 +408,32 @@ void _game_impl::Step() {
 
   if (player->GetY() < 0) {
     if (!up_map_.empty()) {
-      Load(up_map_.c_str());
+      Load(GeneratePath(cur_map_, up_map_).c_str());
+      player->MoveTo(player->GetX(), player->GetY() + 600);
     } else {
       player->MoveTo(player->GetX(), 0);
     }
   }
   if (player->GetY() >= 600) {
     if (!down_map_.empty()) {
-      Load(down_map_.c_str());
+      Load(GeneratePath(cur_map_, down_map_).c_str());
+      player->MoveTo(player->GetX(), player->GetY() - 600);
     } else {
       player->MoveTo(player->GetX(), 599);
     }
   }
   if (player->GetX() < 0) {
     if (!left_map_.empty()) {
-      Load(left_map_.c_str());
+      Load(GeneratePath(cur_map_, left_map_).c_str());
+      player->MoveTo(player->GetX() + 800, player->GetY());
     } else {
       player->MoveTo(0, player->GetY());
     }
   }
   if (player->GetX() >= 800) {
     if (!right_map_.empty()) {
-      Load(right_map_.c_str());
+      Load(GeneratePath(cur_map_, right_map_).c_str());
+      player->MoveTo(player->GetX() - 800, player->GetY());
     } else {
       player->MoveTo(799, player->GetY());
     }

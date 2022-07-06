@@ -11,9 +11,15 @@
 #include <unordered_map>
 #include <vector>
 
+#include "common/common.h"
+#include "entity/Barrier.h"
 #include "entity/Entity.h"
+#include "entity/Player.h"
+#include "entity/Portal.h"
+#include "entity/Trap.h"
 #include "entityset/EntitySet.h"
 #include "game/Game.h"
+#include "hotarea/HotArea.h"
 
 class _game_impl {
  public:
