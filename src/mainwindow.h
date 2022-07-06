@@ -22,8 +22,9 @@ class MainWindow : public QMainWindow {
   Ui::MainWindow *ui;
   QLabel *death_count_;
   QLabel *play_time_;
+  QLabel *debug_output_;
   QLabel *fps_;
-  QLabel *frame_lag_;
+  QLabel *frame_latency_;
   GameUI *game_ui_;
 
  protected:
@@ -32,6 +33,7 @@ class MainWindow : public QMainWindow {
 
  signals:
   void Pause();
+  void Restart();
   void SendKey(QKeyEvent *event, bool is_pressed);
 };
 
