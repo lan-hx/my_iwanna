@@ -7,46 +7,32 @@
 
 #include <Qt>
 #include <cstdint>
-#include <string>
-#include <unordered_map>
 #include <vector>
 
-#include "entity/Entity.h"
-#include "entityset/EntitySet.h"
-
+class _game_impl;
 class Entity;
 
 class Game {
  public:
   explicit Game();
+  ~Game();
   int32_t Load(const char *file_name);
-  void Reset();
-  int32_t ResetAndLoad(const char *file);
+  void Restart();
   void Event(const Qt::Key &key, bool is_pressed);
   void Step();
   void CloseMap();
-  bool MapLoaded();
-  inline bool InGame() const { return in_game_; }
-  inline int32_t GetFrameRate() const { return frame_rate_; }
-  void SetFrameRate(int32_t);
+  bool InGame() const;
+  int32_t GetFrameRate();
   std::vector<Entity *> GetEntitySet() const;
   const char *GetBackgroundPic() const;
-  inline bool IsDead() const { return dead_; }
-  inline int32_t DeathCount() const { return death_cnt_; }
-  inline double PlayTime() const { return static_cast<double>(step_cnt_) / static_cast<double>(frame_rate_); }
+  bool IsDead() const;
+  int32_t DeathCount();
+  double PlayTime() const;
+  const char *GetDebugOutput();
+  Entity *GetPlayer();
 
  private:
-  bool dead_ = false;
-  int32_t death_cnt_ = 0;
-  int64_t step_cnt_ = 0LL;
-  EntitySet *entities_;
-  std::string background_pic_;
-  bool in_game_ = false;
-  int32_t frame_rate_ = 60;
-  std::unordered_map<Qt::Key, std::string> key_command_map_;
-  std::unordered_map<std::string, int32_t> command_state_;
+  _game_impl *game_impl_;
 };
-
-int32_t Collide(const Entity &en1, const Entity &en2);
 
 #endif  // MY_IWANNA_SRC_GAME_GAME_H_

@@ -1,13 +1,14 @@
 #ifndef MY_IWANNA_SRC_COMMON_COMMON_H_
 #define MY_IWANNA_SRC_COMMON_COMMON_H_
 
+#include <algorithm>
 #include <cassert>
 #include <cctype>
 #include <cstdint>
 #include <cstring>
 #include <istream>
 
-enum EntityTypeId { invalid_type = -1, player, barrier, trap, portal };
+enum EntityTypeId { invalid_type = -1, player, barrier, trap, portal, resurrection };
 enum YState { on_ground, first_jump_begin, first_jump_end, second_jump_begin, second_jump_end, landed, drifting };
 enum XState { idle, moving };
 enum HotAreaType { invalid_hotarea_type = -1, rectangular, triangular, point_set };
