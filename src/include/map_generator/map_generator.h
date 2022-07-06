@@ -87,7 +87,11 @@ void GenerateTestMap() {
   trap.SetCurState(0);
   trap.SetDrawType(scaled);
   int size = 0;
-  sprintf(s, "%8d", -1);
+  sprintf(s + size, "%8d", 0);
+  size += 8;
+  sprintf(s + size, "%8d", 0);
+  size += 8;
+  sprintf(s + size, "%8d", -1);
   size += 8;
   sprintf(s + size, "%8d", 4);
   size += 8;
@@ -99,7 +103,15 @@ void GenerateTestMap() {
   size += 8;
   sprintf(s + size, "%8d", 40);
   size += 8;
-  FILE *fp = fopen("D:/my_iwanna/about/test_map8.map", "w");
+  FILE *fp = fopen("D:/my_iwanna/about/test_map9.map", "w");
+  sprintf(s + size, "%8d", 0);
+  size += 8;
+  sprintf(s + size, "%8d", 0);
+  size += 8;
+  sprintf(s + size, "%8d", 0);
+  size += 8;
+  sprintf(s + size, "%8d", 0);
+  size += 8;
   fwrite(s, 1, size, fp);
   fclose(fp);
 }

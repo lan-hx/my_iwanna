@@ -37,6 +37,13 @@ inline std::istream &operator>>(std::istream &i, EntityTypeId &t) {
   return i;
 }
 
+inline std::string GeneratePath(std::string cur_path, const std::string &file_name) {
+  while ((!cur_path.empty()) && (cur_path.back() != '/') && (cur_path.back() != '\\')) {
+    cur_path.pop_back();
+  }
+  return cur_path + file_name;
+}
+
 // std::istream &operator>>(std::istream &i, DrawType &t) {
 //   int32_t tmp;
 //   i >> tmp;
