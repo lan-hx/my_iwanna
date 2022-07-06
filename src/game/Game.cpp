@@ -9,9 +9,7 @@
 Game::Game() : game_impl_(new _game_impl) {}
 Game::~Game() { delete game_impl_; }
 int32_t Game::Load(const char *file_name) { return game_impl_->Load(file_name); }
-void Game::Restart() {
-  // todo: not implemented
-}
+void Game::Restart() { game_impl_->Restart(); }
 void Game::Event(const Qt::Key &key, bool is_pressed) { game_impl_->Event(key, is_pressed); }
 void Game::Step() { game_impl_->Step(); }
 void Game::CloseMap() { game_impl_->CloseMap(); }

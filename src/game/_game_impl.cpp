@@ -30,6 +30,10 @@ _game_impl::_game_impl() {
   key_command_map_[Qt::Key_Z] = "Shoot";
   key_command_map_[Qt::Key_A] = "Left";
   key_command_map_[Qt::Key_D] = "Right";
+  Init();
+}
+
+void _game_impl::Init() {
   command_state_["Left"] = 0;
   command_state_["Right"] = 0;
   command_state_["Jump"] = 0;
@@ -44,6 +48,18 @@ const char *_game_impl::GetDebugOutput() {
   return output.c_str();
 }
 
+void _game_impl::Die() {
+  if (dead_) {
+    return;
+  }
+  dead_ = true;
+  ++death_cnt_;
+}
+
+void _game_impl::Save() {
+  // to be implemented
+}
+
 int32_t _game_impl::Load(const char *file_name) {
   if (strcmp(file_name, "") == 0) {
     in_game_ = false;
@@ -54,7 +70,7 @@ int32_t _game_impl::Load(const char *file_name) {
     in_game_ = false;
     return 1;
   }
-  int32_t file_size;
+  cur_map_ = file_name;
   int32_t entity_num;
   int32_t entity_size;
   EntityTypeId entity_type;
@@ -64,40 +80,41 @@ int32_t _game_impl::Load(const char *file_name) {
   std::vector<Entity *> trap_vec;
   std::vector<Entity *> portal_vec;
   int32_t background_len;
+  int32_t left_map_len;
+  int32_t right_map_len;
+  int32_t up_map_len;
+  int32_t down_map_len;
   dead_ = false;
   death_cnt_ = 0;
   step_cnt_ = 0LL;
-  ifs >> file_size >> entity_num;
+  ifs >> death_cnt_ >> step_cnt_;
+  ifs >> cur_resurrection_;
+  ifs >> entity_num;
   for (int i = 0; i < entity_num; ++i) {
     ifs >> entity_size >> entity_type;
-    try {
-      Entity *e = nullptr;
-      switch (entity_type) {
-        case EntityTypeId::player:
-          assert((player_vec.empty()) && ("Multiple Player Info"));
-          e = player_vec.emplace_back(new Player());
-          ifs >> *static_cast<Player *>(e);
-          break;
-        case EntityTypeId::barrier:
-          e = barrier_vec.emplace_back(new Barrier());
-          ifs >> *static_cast<Barrier *>(e);
-          break;
-        case EntityTypeId::trap:
-          e = trap_vec.emplace_back(new Trap());
-          ifs >> *static_cast<Trap *>(e);
-          break;
-        case EntityTypeId::portal:
-          e = portal_vec.emplace_back(new Portal());
-          ifs >> *static_cast<Portal *>(e);
-          break;
-        case EntityTypeId::invalid_type:
-          assert(true && ("Invalid Entity"));
-          break;
-        default:;
-      }
-    } catch (std::exception &e) {
-      in_game_ = false;
-      return 1;
+    Entity *e = nullptr;
+    switch (entity_type) {
+      case EntityTypeId::player:
+        assert((player_vec.empty()) && ("Multiple Player Info"));
+        e = player_vec.emplace_back(new Player());
+        ifs >> *static_cast<Player *>(e);
+        break;
+      case EntityTypeId::barrier:
+        e = barrier_vec.emplace_back(new Barrier());
+        ifs >> *static_cast<Barrier *>(e);
+        break;
+      case EntityTypeId::trap:
+        e = trap_vec.emplace_back(new Trap());
+        ifs >> *static_cast<Trap *>(e);
+        break;
+      case EntityTypeId::portal:
+        e = portal_vec.emplace_back(new Portal());
+        ifs >> *static_cast<Portal *>(e);
+        break;
+      case EntityTypeId::invalid_type:
+        assert(true && ("Invalid Entity"));
+        break;
+      default:;
     }
   }
   // entities_ = new EntitySet(std::move(entity_vec));
@@ -108,6 +125,32 @@ int32_t _game_impl::Load(const char *file_name) {
     assert((static_cast<int32_t>(background_pic_.length()) == background_len) && ("background picture path error"));
   }
   ifs >> frame_rate_;
+  ifs >> left_map_len;
+  if (left_map_len > 0) {
+    ifs >> left_map_;
+    assert((static_cast<int32_t>(left_map_.length()) == left_map_len) && ("path error"));
+  }
+  ifs >> right_map_len;
+  if (right_map_len > 0) {
+    ifs >> right_map_;
+    assert((static_cast<int32_t>(right_map_.length()) == right_map_len) && ("path error"));
+  }
+  ifs >> up_map_len;
+  if (up_map_len > 0) {
+    ifs >> up_map_;
+    assert((static_cast<int32_t>(up_map_.length()) == up_map_len) && ("path error"));
+  }
+  ifs >> down_map_len;
+  if (down_map_len > 0) {
+    ifs >> down_map_;
+    assert((static_cast<int32_t>(down_map_.length()) == down_map_len) && ("path error"));
+  }
+  Init();
+  if (cur_resurrection_ >= 0) {
+    // to be implemented
+    // entities_->GetPlayer()->MoveTo(entities_->GetResurrection(cur_resurrection_)->GetX(),
+    // entities_->GetResurrection(cur_resurrection_)->GetY());
+  }
   if (ifs.eof()) {
     ifs.close();
     in_game_ = true;
@@ -119,15 +162,32 @@ int32_t _game_impl::Load(const char *file_name) {
 }
 
 void _game_impl::CloseMap() {
+  Save();
   dead_ = false;
   death_cnt_ = 0;
   step_cnt_ = 0LL;
+  cur_map_.clear();
   entities_->Destroy();
   delete entities_;
   entities_ = nullptr;
   background_pic_.clear();
+  left_map_.clear();
+  right_map_.clear();
+  up_map_.clear();
+  down_map_.clear();
   in_game_ = false;
   frame_rate_ = 60;
+}
+
+void _game_impl::Restart() {
+  if (!dead_) {
+    Die();
+  }
+  int32_t death_cnt = death_cnt_;
+  int32_t step_cnt = step_cnt_;
+  Load(cur_map_.c_str());
+  death_cnt_ = death_cnt;
+  step_cnt_ = step_cnt;
 }
 
 void _game_impl::Event(const Qt::Key &key, bool is_pressed) {
@@ -242,10 +302,7 @@ void _game_impl::Step() {
   }
   while (!entity_set.empty()) {
     if (dy == 0) {
-      if (!dead_) {
-        dead_ = true;
-        ++death_cnt_;
-      }
+      Die();
     }
     if (vy > 0) {
       player->MoveByY(-1);
@@ -278,10 +335,7 @@ void _game_impl::Step() {
   }
   while (!entity_set.empty()) {
     if (dx == 0) {
-      if (!dead_) {
-        dead_ = true;
-        ++death_cnt_;
-      }
+      Die();
     }
     if (vx > 0) {
       player->MoveByX(-1);
@@ -352,15 +406,41 @@ void _game_impl::Step() {
   for (auto entity : entities_->GetTrapSet()) {
     if (!entity->IsHidden()) {
       if (Collide(*player, *entity) != 0) {
-        if (!dead_) {
-          dead_ = true;
-          ++death_cnt_;
-        }
+        Die();
       }
     }
   }
 
   command_state_["Jump"] = command_state_["Jump"] & 1;
+
+  if (player->GetY() < 0) {
+    if (!up_map_.empty()) {
+      Load(up_map_.c_str());
+    } else {
+      player->MoveTo(player->GetX(), 0);
+    }
+  }
+  if (player->GetY() >= 600) {
+    if (!down_map_.empty()) {
+      Load(down_map_.c_str());
+    } else {
+      player->MoveTo(player->GetX(), 599);
+    }
+  }
+  if (player->GetX() < 0) {
+    if (!left_map_.empty()) {
+      Load(left_map_.c_str());
+    } else {
+      player->MoveTo(0, player->GetY());
+    }
+  }
+  if (player->GetX() >= 800) {
+    if (!right_map_.empty()) {
+      Load(right_map_.c_str());
+    } else {
+      player->MoveTo(799, player->GetY());
+    }
+  }
 }
 
 int32_t Collide(const Entity &en1, const Entity &en2) {
