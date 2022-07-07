@@ -21,7 +21,7 @@ class Game : public QObject {
 
  public:
   explicit Game();
-  int32_t Load(const char *file_name);
+  void Load(const char *file_name);
   void Restart();
   void Event(const Qt::Key &key, bool is_pressed);
   void Step();
@@ -42,6 +42,7 @@ class Game : public QObject {
   void Die();
   void Save();
   void Init();
+  void ChangeMap(const char *file_name);
 
   bool dead_ = false;
   int32_t death_cnt_ = 0;

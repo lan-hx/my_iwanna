@@ -18,6 +18,8 @@
 class Player : public Entity {
  public:
   explicit Player();
+  Player(const Player &player) = default;
+  inline Player &operator=(const Player &player) = default;
   inline void SetVx(int32_t vx) { vx_ = vx; }
   inline void SetVy(int32_t vy) { vy_ = vy; }
   inline void SetXState(XState state) { x_state_ = state; }

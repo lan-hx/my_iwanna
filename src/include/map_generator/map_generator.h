@@ -7,6 +7,7 @@
 #include "entity/Entity.h"
 #include "entity/Player.h"
 #include "entity/Trap.h"
+#include "entity/Portal.h"
 
 void GenerateTestMap() {
   char s[10000];
@@ -14,10 +15,12 @@ void GenerateTestMap() {
   Barrier block;
   Barrier block2;
   Trap trap;
+  Portal port;
   HotArea pha;
   HotArea bha;
   HotArea bha2;
   HotArea tha;
+  HotArea ptha;
   player.SetPos(150, 250);
   player.SetWidth(25);
   player.SetHeight(21);
@@ -86,6 +89,23 @@ void GenerateTestMap() {
   trap.AddStatePic(":/platforms/trap1.gif");
   trap.SetCurState(0);
   trap.SetDrawType(scaled);
+  port.SetPos(440, 230);
+  port.SetWidth(30);
+  port.SetHeight(30);
+  ptha.SetType(rectangular);
+  ptha.SetPointNum(2);
+  ptha.AddPoint(0, 0);
+  ptha.AddPoint(30, 30);
+  port.SetHotArea(ptha);
+  port.SetHidden(false);
+  port.SetDisplayPriority(1);
+  port.SetRefreshRate(1);
+  port.SetStateNum(0);
+  port.AddStatePic(":/platforms/door.png");
+  port.SetCurState(0);
+  port.SetDrawType(scaled);
+  port.SetSuccess(false);
+  port.SetMap("test_map10.map");
   int size = 0;
   sprintf(s + size, "%8d", 0);
   size += 8;
@@ -93,25 +113,34 @@ void GenerateTestMap() {
   size += 8;
   sprintf(s + size, "%8d", -1);
   size += 8;
-  sprintf(s + size, "%8d", 4);
+  sprintf(s + size, "%8d", 5);
   size += 8;
   size += player.SerializeTo(s + size);
   size += block.SerializeTo(s + size);
   size += block2.SerializeTo(s + size);
   size += trap.SerializeTo(s + size);
+  size += port.SerializeTo(s + size);
   sprintf(s + size, "%8d", 0);
   size += 8;
   sprintf(s + size, "%8d", 40);
   size += 8;
-  FILE *fp = fopen("D:/my_iwanna/about/test_map9.map", "w");
-  sprintf(s + size, "%8d", 0);
+  FILE *fp = fopen("D:/my_iwanna/about/test_map11.map", "w");
+  sprintf(s + size, "%8d", 14);
   size += 8;
-  sprintf(s + size, "%8d", 0);
+  sprintf(s + size, " test_map11.map");
+  size += 15;
+  sprintf(s + size, "%8d", 14);
   size += 8;
-  sprintf(s + size, "%8d", 0);
+  sprintf(s + size, " test_map11.map");
+  size += 15;
+  sprintf(s + size, "%8d", 14);
   size += 8;
-  sprintf(s + size, "%8d", 0);
+  sprintf(s + size, " test_map11.map");
+  size += 15;
+  sprintf(s + size, "%8d", 14);
   size += 8;
+  sprintf(s + size, " test_map11.map");
+  size += 15;
   fwrite(s, 1, size, fp);
   fclose(fp);
 }

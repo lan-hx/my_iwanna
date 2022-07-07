@@ -19,6 +19,7 @@
 #include "entity/Player.h"
 #include "entity/Portal.h"
 #include "entity/Trap.h"
+#include "entity/Resurrection.h"
 #include "hotarea/HotArea.h"
 
 std::vector<Entity *> Game::GetEntitySet() const { return entities_->GetEntitySet(); }
@@ -60,15 +61,15 @@ void Game::Save() {
   // to be implemented
 }
 
-int32_t Game::Load(const char *file_name) {
+void Game::Load(const char *file_name) {
   if (strcmp(file_name, "") == 0) {
     in_game_ = false;
-    return 1;
+    emit LoadedCallBack(1);
   }
   std::ifstream ifs(file_name);
   if (!ifs.is_open()) {
     in_game_ = false;
-    return 1;
+    emit LoadedCallBack(1);
   }
   cur_map_ = file_name;
   int32_t entity_num;
@@ -79,6 +80,7 @@ int32_t Game::Load(const char *file_name) {
   std::vector<Entity *> barrier_vec;
   std::vector<Entity *> trap_vec;
   std::vector<Entity *> portal_vec;
+  std::vector<Entity *> resurrection_vec;
   int32_t background_len;
   int32_t left_map_len;
   int32_t right_map_len;
@@ -111,6 +113,9 @@ int32_t Game::Load(const char *file_name) {
         e = portal_vec.emplace_back(new Portal());
         ifs >> *static_cast<Portal *>(e);
         break;
+      case EntityTypeId::resurrection:
+        e = resurrection_vec.emplace_back(new Resurrection());
+        ifs >> *static_cast<Resurrection *>(e);
       case EntityTypeId::invalid_type:
         assert(true && ("Invalid Entity"));
         break;
@@ -118,7 +123,7 @@ int32_t Game::Load(const char *file_name) {
     }
   }
   // entities_ = new EntitySet(std::move(entity_vec));
-  entities_ = new EntitySet(std::move(player_vec), std::move(barrier_vec), std::move(trap_vec), std::move(portal_vec));
+  entities_ = new EntitySet(std::move(player_vec), std::move(barrier_vec), std::move(trap_vec), std::move(portal_vec), std::move(resurrection_vec));
   ifs >> background_len;
   if (background_len > 0) {
     ifs >> background_pic_;
@@ -155,12 +160,11 @@ int32_t Game::Load(const char *file_name) {
     ifs.close();
     in_game_ = true;
     emit LoadedCallBack(0);
-    return 0;
+  } else {
+    ifs.close();
+    in_game_ = false;
+    emit LoadedCallBack(1);
   }
-  ifs.close();
-  in_game_ = false;
-  emit LoadedCallBack(1);
-  return 1;
 }
 
 void Game::CloseMap() {
@@ -179,6 +183,123 @@ void Game::CloseMap() {
   down_map_.clear();
   in_game_ = false;
   frame_rate_ = 60;
+}
+
+void Game::ChangeMap(const char *file_name) {
+  Save();
+  Player *cur_player = new Player(*(entities_->GetPlayer()));
+  dead_ = false;
+  cur_map_.clear();
+  entities_->Destroy();
+  delete entities_;
+  entities_ = nullptr;
+  background_pic_.clear();
+  left_map_.clear();
+  right_map_.clear();
+  up_map_.clear();
+  down_map_.clear();
+  if (strcmp(file_name, "") == 0) {
+    in_game_ = false;
+    emit LoadedCallBack(1);
+  }
+  std::ifstream ifs(file_name);
+  if (!ifs.is_open()) {
+    in_game_ = false;
+    emit LoadedCallBack(1);
+  }
+  cur_map_ = file_name;
+  int32_t temp;
+  int32_t entity_num;
+  int32_t entity_size;
+  EntityTypeId entity_type;
+  std::vector<Entity *> entity_vec;
+  std::vector<Entity *> player_vec;
+  std::vector<Entity *> barrier_vec;
+  std::vector<Entity *> trap_vec;
+  std::vector<Entity *> portal_vec;
+  std::vector<Entity *> resurrection_vec;
+  int32_t background_len;
+  int32_t left_map_len;
+  int32_t right_map_len;
+  int32_t up_map_len;
+  int32_t down_map_len;
+  ifs >> temp >> temp;
+  ifs >> cur_resurrection_;
+  ifs >> entity_num;
+  for (int i = 0; i < entity_num; ++i) {
+    ifs >> entity_size >> entity_type;
+    Entity *e = nullptr;
+    switch (entity_type) {
+      case EntityTypeId::player:
+        assert((player_vec.empty()) && ("Multiple Player Info"));
+        e = player_vec.emplace_back(new Player());
+        ifs >> *static_cast<Player *>(e);
+        break;
+      case EntityTypeId::barrier:
+        e = barrier_vec.emplace_back(new Barrier());
+        ifs >> *static_cast<Barrier *>(e);
+        break;
+      case EntityTypeId::trap:
+        e = trap_vec.emplace_back(new Trap());
+        ifs >> *static_cast<Trap *>(e);
+        break;
+      case EntityTypeId::portal:
+        e = portal_vec.emplace_back(new Portal());
+        ifs >> *static_cast<Portal *>(e);
+        break;
+      case EntityTypeId::resurrection:
+        e = resurrection_vec.emplace_back(new Resurrection());
+        ifs >> *static_cast<Resurrection *>(e);
+      case EntityTypeId::invalid_type:
+        assert(true && ("Invalid Entity"));
+        break;
+      default:;
+    }
+  }
+  // entities_ = new EntitySet(std::move(entity_vec));
+  entities_ = new EntitySet(std::move(player_vec), std::move(barrier_vec), std::move(trap_vec), std::move(portal_vec), std::move(resurrection_vec));
+  *(entities_->GetPlayer()) = *cur_player;
+  delete cur_player;
+  ifs >> background_len;
+  if (background_len > 0) {
+    ifs >> background_pic_;
+    assert((static_cast<int32_t>(background_pic_.length()) == background_len) && ("background picture path error"));
+  }
+  ifs >> frame_rate_;
+  ifs >> left_map_len;
+  if (left_map_len > 0) {
+    ifs >> left_map_;
+    assert((static_cast<int32_t>(left_map_.length()) == left_map_len) && ("path error"));
+  }
+  ifs >> right_map_len;
+  if (right_map_len > 0) {
+    ifs >> right_map_;
+    assert((static_cast<int32_t>(right_map_.length()) == right_map_len) && ("path error"));
+  }
+  ifs >> up_map_len;
+  if (up_map_len > 0) {
+    ifs >> up_map_;
+    assert((static_cast<int32_t>(up_map_.length()) == up_map_len) && ("path error"));
+  }
+  ifs >> down_map_len;
+  if (down_map_len > 0) {
+    ifs >> down_map_;
+    assert((static_cast<int32_t>(down_map_.length()) == down_map_len) && ("path error"));
+  }
+  if (cur_resurrection_ >= 0) {
+    // to be implemented
+    // entities_->GetPlayer()->MoveTo(entities_->GetResurrection(cur_resurrection_)->GetX(),
+    // entities_->GetResurrection(cur_resurrection_)->GetY());
+  }
+  if (ifs.eof()) {
+    ifs.close();
+    in_game_ = true;
+    emit LoadedCallBack(0);
+  } else {
+    ifs.close();
+    in_game_ = false;
+    emit LoadedCallBack(1);
+  }
 }
 
 void Game::Restart() {
@@ -415,36 +536,42 @@ void Game::Step() {
 
   command_state_["Jump"] = command_state_["Jump"] & 1;
 
-  if (player->GetY() < 0) {
+  int32_t cur_x = player->GetX();
+  int32_t cur_y = player->GetY();
+  if (cur_y < 0) {
     if (!up_map_.empty()) {
-      Load(GeneratePath(cur_map_, up_map_).c_str());
-      player->MoveTo(player->GetX(), player->GetY() + 600);
+      ChangeMap(GeneratePath(cur_map_, up_map_).c_str());
+      player = entities_->GetPlayer();
+      player->MoveTo(cur_x, cur_y + 600);
     } else {
-      player->MoveTo(player->GetX(), 0);
+      player->MoveTo(cur_x, 0);
     }
   }
-  if (player->GetY() >= 600) {
+  if (cur_y >= 600) {
     if (!down_map_.empty()) {
-      Load(GeneratePath(cur_map_, down_map_).c_str());
-      player->MoveTo(player->GetX(), player->GetY() - 600);
+      ChangeMap(GeneratePath(cur_map_, down_map_).c_str());
+      player = entities_->GetPlayer();
+      player->MoveTo(cur_x, cur_y - 600);
     } else {
-      player->MoveTo(player->GetX(), 599);
+      player->MoveTo(cur_x, 599);
     }
   }
-  if (player->GetX() < 0) {
+  if (cur_x < 0) {
     if (!left_map_.empty()) {
-      Load(GeneratePath(cur_map_, left_map_).c_str());
-      player->MoveTo(player->GetX() + 800, player->GetY());
+      ChangeMap(GeneratePath(cur_map_, left_map_).c_str());
+      player = entities_->GetPlayer();
+      player->MoveTo(cur_x + 800, cur_y);
     } else {
-      player->MoveTo(0, player->GetY());
+      player->MoveTo(0, cur_y);
     }
   }
-  if (player->GetX() >= 800) {
+  if (cur_x >= 800) {
     if (!right_map_.empty()) {
-      Load(GeneratePath(cur_map_, right_map_).c_str());
-      player->MoveTo(player->GetX() - 800, player->GetY());
+      ChangeMap(GeneratePath(cur_map_, right_map_).c_str());
+      player = entities_->GetPlayer();
+      player->MoveTo(cur_x - 800, cur_y);
     } else {
-      player->MoveTo(799, player->GetY());
+      player->MoveTo(799, cur_y);
     }
   }
   if (IsDead()) {
