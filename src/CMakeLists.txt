@@ -11,7 +11,7 @@ FILE(GLOB_RECURSE IWANNA_SOURCE_MAIN
         ${PROJECT_SOURCE_DIR}/src/*.h
         )
 message(STATUS "find sources: ${IWANNA_SOURCE} ${IWANNA_SOURCE_MAIN}")
-ADD_EXECUTABLE(iwanna ${IWANNA_SOURCE} ${IWANNA_SOURCE_MAIN} ../res/res.qrc)
+ADD_EXECUTABLE(iwanna ${IWANNA_SOURCE} ${IWANNA_SOURCE_MAIN} ../res/res.qrc entity/Resurrection.cpp "include/entity/ Resurrection.h")
 TARGET_LINK_LIBRARIES(iwanna PRIVATE Qt5::Widgets)
 set_target_properties(iwanna PROPERTIES
         MACOSX_BUNDLE_GUI_IDENTIFIER huaji

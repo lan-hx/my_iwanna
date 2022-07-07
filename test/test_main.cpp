@@ -43,28 +43,28 @@
 //}
 TEST(Jumptest, Gametest){
   Game game;
-  game.Load("test_map4.map");
+  game.Load("test_map9.map");
   Qt::Key key = Qt::Key_Shift;
   Player* player  = reinterpret_cast<Player*>((game.GetEntitySet())[0]);
   game.Event(key,1);
   game.Step();
-  for(int i = 1;i<9;i++){
-    EXPECT_EQ(-6,player->GetVy());
+  for(int i = 1;i<8;i++){
+    EXPECT_EQ(-5,player->GetVy());
     game.Step();
   }
   game.Event(key,0);
   for(int i = 1;i<6;i++){
-    EXPECT_EQ(-6+i,player->GetVy());
+    EXPECT_EQ(-5+i,player->GetVy());
     game.Step();
   }
-  EXPECT_EQ(0,player->GetVy());
+  EXPECT_EQ(1,player->GetVy());
   game.Event(key,1);
-  EXPECT_EQ(-6,player->GetVy());
+  EXPECT_EQ(1,player->GetVy());
   game.CloseMap();
 }
 TEST(Colitest, Gametest){
   Game game;
-  game.Load("test_map4.map");
+  game.Load("test_map9.map");
   Qt::Key key = Qt::Key_Shift;
   Player* player  = reinterpret_cast<Player*>((game.GetEntitySet())[0]);
 }

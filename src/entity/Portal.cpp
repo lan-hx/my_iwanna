@@ -2,7 +2,7 @@
 // Created by lan on 2022/6/29.
 //
 
-#include "include/entity/Portal.h"
+#include "entity/Portal.h"
 
 std::istream &operator>>(std::istream &i, Portal &p) {
   i >> *static_cast<Entity *>(&p);

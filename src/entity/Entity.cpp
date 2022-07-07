@@ -2,9 +2,9 @@
 // Created by lan on 2022/6/29.
 //
 
-#include "include/entity/Entity.h"
+#include "entity/Entity.h"
 
-#include "include/common/common.h"
+#include "common/common.h"
 
 int32_t Entity::entity_id_cnt = 0;
 

@@ -2,7 +2,7 @@
 // Created by lan on 2022/6/29.
 //
 
-#include "include/entity/Barrier.h"
+#include "entity/Barrier.h"
 // #include "common/common.h"
 
 std::istream &operator>>(std::istream &i, Barrier &b) {

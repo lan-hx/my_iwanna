@@ -1,7 +1,7 @@
 //
-// Created by zzh on 2022/7/6.
+// Created by zzh on 2022/7/7.
 //
-#include "include/entity/Resurrection.h"
+#include "entity/Resurrection.h"
 std::istream &operator>>(std::istream &i, Resurrection &p) {
   i >> *static_cast<Entity *>(&p);
   assert((p.GetHotArea().GetType() == rectangular) && ("Hot Area of Resurrection must be rectangular. "));

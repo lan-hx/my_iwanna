@@ -2,7 +2,7 @@
 // Created by lan on 2022/6/29.
 //
 
-#include "include/entity/Player.h"
+#include "entity/Player.h"
 
 Player::Player() : Entity(player) {
   vx_ = 0;

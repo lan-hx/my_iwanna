@@ -110,7 +110,7 @@ else()
     message(STATUS "found clang-tidy at ${CLANG_TIDY_BIN}")
 endif()
 
-set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_BIN}")
+#set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_BIN}")
 
 include_directories(src/include test/include)
 
