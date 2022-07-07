@@ -40,7 +40,7 @@ class Game : public QObject {
 
  private:
   void Die();
-  void Save();
+  void Save(const int32_t &resurrection_index);
   void Init();
   void ChangeMap(const char *file_name);
 

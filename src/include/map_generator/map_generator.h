@@ -6,8 +6,9 @@
 #include "entity/Barrier.h"
 #include "entity/Entity.h"
 #include "entity/Player.h"
-#include "entity/Trap.h"
 #include "entity/Portal.h"
+#include "entity/Resurrection.h"
+#include "entity/Trap.h"
 
 void GenerateTestMap() {
   char s[10000];
@@ -16,11 +17,14 @@ void GenerateTestMap() {
   Barrier block2;
   Trap trap;
   Portal port;
+  Resurrection resur;
+
   HotArea pha;
   HotArea bha;
   HotArea bha2;
   HotArea tha;
   HotArea ptha;
+  HotArea rha;
   player.SetPos(150, 250);
   player.SetWidth(25);
   player.SetHeight(21);
@@ -106,6 +110,22 @@ void GenerateTestMap() {
   port.SetDrawType(scaled);
   port.SetSuccess(false);
   port.SetMap("test_map10.map");
+  resur.SetPos(250, 300);
+  resur.SetWidth(31);
+  resur.SetHeight(33);
+  rha.SetType(rectangular);
+  rha.SetPointNum(2);
+  rha.AddPoint(0, 0);
+  rha.AddPoint(31, 33);
+  resur.SetHotArea(rha);
+  resur.SetHidden(false);
+  resur.SetDisplayPriority(1);
+  resur.SetRefreshRate(1);
+  resur.SetStateNum(0);
+  resur.AddStatePic(":/platforms/Archive_point_off.png");
+  resur.AddStatePic(":/platforms/Archive_point_on.png");
+  resur.SetCurState(0);
+  resur.SetDrawType(scaled);
   int size = 0;
   sprintf(s + size, "%8d", 0);
   size += 8;
@@ -113,13 +133,14 @@ void GenerateTestMap() {
   size += 8;
   sprintf(s + size, "%8d", -1);
   size += 8;
-  sprintf(s + size, "%8d", 5);
+  sprintf(s + size, "%8d", 6);
   size += 8;
   size += player.SerializeTo(s + size);
   size += block.SerializeTo(s + size);
   size += block2.SerializeTo(s + size);
   size += trap.SerializeTo(s + size);
   size += port.SerializeTo(s + size);
+  size += resur.SerializeTo(s + size);
   sprintf(s + size, "%8d", 0);
   size += 8;
   sprintf(s + size, "%8d", 40);

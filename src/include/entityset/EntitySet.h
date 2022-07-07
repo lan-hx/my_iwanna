@@ -9,6 +9,7 @@
 
 #include "entity/Entity.h"
 #include "entity/Player.h"
+#include "entity/Resurrection.h"
 
 class EntitySet {
  public:
@@ -31,18 +32,11 @@ class EntitySet {
   inline std::vector<Entity *> GetBarrierSet() const { return barrier_set_; }
   inline std::vector<Entity *> GetTrapSet() const { return trap_set_; }
   inline std::vector<Entity *> GetPortalSet() const { return portal_set_; }
+  inline std::vector<Entity *> GetResurrectionSet() const { return resurrection_set_; }
   inline Player *GetPlayer() { return player_set_.empty() ? nullptr : static_cast<Player *>(player_set_[0]); }
-  void Destroy() {
-    for (auto entity_ptr : entities_) {
-      delete entity_ptr;
-    }
-    entities_.clear();
-    player_set_.clear();
-    barrier_set_.clear();
-    trap_set_.clear();
-    portal_set_.clear();
-    resurrection_set_.clear();
-  }
+  Resurrection *GetResurrection(const int32_t &index);
+  void Destroy();
+  int32_t SerializeTo(char *str);
 
  private:
   std::vector<Entity *> entities_;

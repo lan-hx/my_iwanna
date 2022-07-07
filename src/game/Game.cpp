@@ -18,8 +18,8 @@
 #include "entity/Barrier.h"
 #include "entity/Player.h"
 #include "entity/Portal.h"
-#include "entity/Trap.h"
 #include "entity/Resurrection.h"
+#include "entity/Trap.h"
 #include "hotarea/HotArea.h"
 
 std::vector<Entity *> Game::GetEntitySet() const { return entities_->GetEntitySet(); }
@@ -57,8 +57,52 @@ void Game::Die() {
   ++death_cnt_;
 }
 
-void Game::Save() {
+void Game::Save(const int32_t &resurrection_index) {
   // to be implemented
+  char s[10000];
+  int size = 0;
+  sprintf(s + size, "%8d", death_cnt_);
+  size += 8;
+  sprintf(s + size, "%8d", step_cnt_);
+  size += 8;
+  sprintf(s + size, "%8d", resurrection_index);
+  size += 8;
+  size += entities_->SerializeTo(s + size);
+  sprintf(s + size, "%8d", static_cast<int32_t>(background_pic_.length()));
+  size += 8;
+  if (background_pic_.length() > 0) {
+    sprintf(s + size, " %s", background_pic_.c_str());
+    size += static_cast<int32_t>(background_pic_.length()) + 1;
+  }
+  sprintf(s + size, "%8d", frame_rate_);
+  size += 8;
+  sprintf(s + size, "%8d", static_cast<int32_t>(left_map_.length()));
+  size += 8;
+  if (left_map_.length() > 0) {
+    sprintf(s + size, " %s", left_map_.c_str());
+    size += static_cast<int32_t>(left_map_.length()) + 1;
+  }
+  sprintf(s + size, "%8d", static_cast<int32_t>(right_map_.length()));
+  size += 8;
+  if (right_map_.length() > 0) {
+    sprintf(s + size, " %s", right_map_.c_str());
+    size += static_cast<int32_t>(right_map_.length()) + 1;
+  }
+  sprintf(s + size, "%8d", static_cast<int32_t>(up_map_.length()));
+  size += 8;
+  if (up_map_.length() > 0) {
+    sprintf(s + size, " %s", up_map_.c_str());
+    size += static_cast<int32_t>(up_map_.length()) + 1;
+  }
+  sprintf(s + size, "%8d", static_cast<int32_t>(down_map_.length()));
+  size += 8;
+  if (down_map_.length() > 0) {
+    sprintf(s + size, " %s", down_map_.c_str());
+    size += static_cast<int32_t>(down_map_.length()) + 1;
+  }
+  FILE *fp = fopen(cur_map_.c_str(), "w");
+  fwrite(s, 1, size, fp);
+  fclose(fp);
 }
 
 void Game::Load(const char *file_name) {
@@ -116,6 +160,7 @@ void Game::Load(const char *file_name) {
       case EntityTypeId::resurrection:
         e = resurrection_vec.emplace_back(new Resurrection());
         ifs >> *static_cast<Resurrection *>(e);
+        break;
       case EntityTypeId::invalid_type:
         assert(true && ("Invalid Entity"));
         break;
@@ -123,7 +168,8 @@ void Game::Load(const char *file_name) {
     }
   }
   // entities_ = new EntitySet(std::move(entity_vec));
-  entities_ = new EntitySet(std::move(player_vec), std::move(barrier_vec), std::move(trap_vec), std::move(portal_vec), std::move(resurrection_vec));
+  entities_ = new EntitySet(std::move(player_vec), std::move(barrier_vec), std::move(trap_vec), std::move(portal_vec),
+                            std::move(resurrection_vec));
   ifs >> background_len;
   if (background_len > 0) {
     ifs >> background_pic_;
@@ -153,8 +199,8 @@ void Game::Load(const char *file_name) {
   Init();
   if (cur_resurrection_ >= 0) {
     // to be implemented
-    // entities_->GetPlayer()->MoveTo(entities_->GetResurrection(cur_resurrection_)->GetX(),
-    // entities_->GetResurrection(cur_resurrection_)->GetY());
+    entities_->GetPlayer()->MoveTo(entities_->GetResurrection(cur_resurrection_)->GetX(),
+                                   entities_->GetResurrection(cur_resurrection_)->GetY());
   }
   if (ifs.eof()) {
     ifs.close();
@@ -168,7 +214,6 @@ void Game::Load(const char *file_name) {
 }
 
 void Game::CloseMap() {
-  Save();
   dead_ = false;
   death_cnt_ = 0;
   step_cnt_ = 0LL;
@@ -186,10 +231,8 @@ void Game::CloseMap() {
 }
 
 void Game::ChangeMap(const char *file_name) {
-  Save();
   Player *cur_player = new Player(*(entities_->GetPlayer()));
   dead_ = false;
-  cur_map_.clear();
   entities_->Destroy();
   delete entities_;
   entities_ = nullptr;
@@ -207,7 +250,6 @@ void Game::ChangeMap(const char *file_name) {
     in_game_ = false;
     emit LoadedCallBack(1);
   }
-  cur_map_ = file_name;
   int32_t temp;
   int32_t entity_num;
   int32_t entity_size;
@@ -257,9 +299,13 @@ void Game::ChangeMap(const char *file_name) {
     }
   }
   // entities_ = new EntitySet(std::move(entity_vec));
-  entities_ = new EntitySet(std::move(player_vec), std::move(barrier_vec), std::move(trap_vec), std::move(portal_vec), std::move(resurrection_vec));
+  entities_ = new EntitySet(std::move(player_vec), std::move(barrier_vec), std::move(trap_vec), std::move(portal_vec),
+                            std::move(resurrection_vec));
+  int32_t default_x = entities_->GetPlayer()->GetX();
+  int32_t default_y = entities_->GetPlayer()->GetY();
   *(entities_->GetPlayer()) = *cur_player;
   delete cur_player;
+  entities_->GetPlayer()->MoveTo(default_x, default_y);
   ifs >> background_len;
   if (background_len > 0) {
     ifs >> background_pic_;
@@ -287,9 +333,8 @@ void Game::ChangeMap(const char *file_name) {
     assert((static_cast<int32_t>(down_map_.length()) == down_map_len) && ("path error"));
   }
   if (cur_resurrection_ >= 0) {
-    // to be implemented
-    // entities_->GetPlayer()->MoveTo(entities_->GetResurrection(cur_resurrection_)->GetX(),
-    // entities_->GetResurrection(cur_resurrection_)->GetY());
+    entities_->GetPlayer()->MoveTo(entities_->GetResurrection(cur_resurrection_)->GetX(),
+                                   entities_->GetResurrection(cur_resurrection_)->GetY());
   }
   if (ifs.eof()) {
     ifs.close();
@@ -360,10 +405,14 @@ void Game::Step() {
   ++step_cnt_;
   Player *player = entities_->GetPlayer();
   for (auto entity : entities_->GetEntitySet()) {
-    if (entity->GetType() != EntityTypeId::player) {
-      if ((step_cnt_ % entity->GetRefreshRate()) == 0) {
+    switch (entity->GetType()) {
+      case barrier:
+      case trap:
+      case portal:
         entity->SetCurState((entity->GetCurState() + 1) % entity->GetStateNum());
-      }
+        break;
+      default:
+        break;
     }
   }
   std::unordered_set<Entity *> entity_set;
@@ -530,6 +579,28 @@ void Game::Step() {
     if (!entity->IsHidden()) {
       if (Collide(*player, *entity) != 0) {
         Die();
+      }
+    }
+  }
+
+  for (auto entity : entities_->GetPortalSet()) {
+    if (!entity->IsHidden()) {
+      if (Collide(*player, *entity) != 0) {
+        ChangeMap(GeneratePath(cur_map_, (reinterpret_cast<Portal *>(entity))->GetMap()).c_str());
+        player = entities_->GetPlayer();
+      }
+    }
+  }
+
+  for (int32_t i = 0; i < static_cast<int32_t>(entities_->GetResurrectionSet().size()); ++i) {
+    if (!entities_->GetResurrection(i)->IsHidden()) {
+      if (Collide(*player, *(entities_->GetResurrection(i))) != 0) {
+        Save(i);
+        for (auto resur : entities_->GetResurrectionSet()) {
+          resur->SetCurState(0);
+        }
+        entities_->GetResurrection(i)->SetCurState(1);
+        cur_resurrection_ = i;
       }
     }
   }

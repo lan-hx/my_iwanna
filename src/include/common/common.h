@@ -30,6 +30,9 @@ inline std::istream &operator>>(std::istream &i, EntityTypeId &t) {
     case 3:
       t = EntityTypeId::portal;
       break;
+    case 4:
+      t = EntityTypeId::resurrection;
+      break;
     default:
       t = EntityTypeId::invalid_type;
       break;
