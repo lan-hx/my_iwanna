@@ -10,10 +10,17 @@
 class Portal : public Entity {
  public:
   explicit Portal() : Entity(portal) {}
+  inline const std::string GetMap() { return map_; }
+  inline bool Success() { return (success_ != 0); }
+  inline void SetSuccess(const bool &success) { success_ = static_cast<int32_t>(success); }
+  inline void SetMap(const char *file_name) { map_ = file_name; }
+  int32_t SerializeTo(char *str);
 
   friend std::istream &operator>>(std::istream &i, Portal &p);
 
  private:
+  int32_t success_;
+  std::string map_;
 };
 
 std::istream &operator>>(std::istream &i, Portal &p);

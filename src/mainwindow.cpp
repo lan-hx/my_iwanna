@@ -55,7 +55,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   connect(ui->actionopen, &QAction::triggered, [&]() {
     game_ui_->Pause();
     auto file_name = QFileDialog::getOpenFileName(this, "打开地图", "", "");
-    if (game_ui_->Load(file_name.toUtf8()) != 0) {
+    game_ui_->Load(file_name.toUtf8());
+  });
+  connect(game_ui_, &GameUI::LoadResult, [&](int32_t ret) {
+    if (ret != 0) {
       QMessageBox::warning(this, "打开失败", "打开地图失败");
     }
     game_ui_->Continue();

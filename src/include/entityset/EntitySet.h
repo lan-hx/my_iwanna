@@ -9,31 +9,34 @@
 
 #include "entity/Entity.h"
 #include "entity/Player.h"
+#include "entity/Resurrection.h"
 
 class EntitySet {
  public:
   // explicit EntitySet(std::vector<Entity *> &&entities) : entities_(std::move(entities)) {}
   explicit EntitySet(std::vector<Entity *> &&player_set, std::vector<Entity *> &&barrier_set,
-                     std::vector<Entity *> &&trap_set, std::vector<Entity *> &&portal_set)
+                     std::vector<Entity *> &&trap_set, std::vector<Entity *> &&portal_set,
+                     std::vector<Entity *> &&resurrection_set)
       : player_set_(std::move(player_set)),
         barrier_set_(std::move(barrier_set)),
         trap_set_(std::move(trap_set)),
-        portal_set_(std::move(portal_set)) {
+        portal_set_(std::move(portal_set)),
+        resurrection_set_(std::move(resurrection_set)) {
     entities_.insert(entities_.end(), player_set_.begin(), player_set_.end());
     entities_.insert(entities_.end(), barrier_set_.begin(), barrier_set_.end());
     entities_.insert(entities_.end(), trap_set_.begin(), trap_set_.end());
     entities_.insert(entities_.end(), portal_set_.begin(), portal_set_.end());
+    entities_.insert(entities_.end(), resurrection_set_.begin(), resurrection_set_.end());
   }
   inline std::vector<Entity *> GetEntitySet() const { return entities_; }
   inline std::vector<Entity *> GetBarrierSet() const { return barrier_set_; }
   inline std::vector<Entity *> GetTrapSet() const { return trap_set_; }
   inline std::vector<Entity *> GetPortalSet() const { return portal_set_; }
+  inline std::vector<Entity *> GetResurrectionSet() const { return resurrection_set_; }
   inline Player *GetPlayer() { return player_set_.empty() ? nullptr : static_cast<Player *>(player_set_[0]); }
-  void Destroy() {
-    for (auto entity_ptr : entities_) {
-      delete entity_ptr;
-    }
-  }
+  Resurrection *GetResurrection(const int32_t &index);
+  void Destroy();
+  int32_t SerializeTo(char *str);
 
  private:
   std::vector<Entity *> entities_;
@@ -41,6 +44,7 @@ class EntitySet {
   std::vector<Entity *> barrier_set_;
   std::vector<Entity *> trap_set_;
   std::vector<Entity *> portal_set_;
+  std::vector<Entity *> resurrection_set_;
 };
 
 #endif  // MY_IWANNA_SRC_ENTITYSET_ENTITYSET_H_

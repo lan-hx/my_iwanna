@@ -8,7 +8,7 @@
 #include <cstring>
 #include <istream>
 
-enum EntityTypeId { invalid_type = -1, player, barrier, trap, portal };
+enum EntityTypeId { invalid_type = -1, player, barrier, trap, portal, resurrection };
 enum YState { on_ground, first_jump_begin, first_jump_end, second_jump_begin, second_jump_end, landed, drifting };
 enum XState { idle, moving };
 enum HotAreaType { invalid_hotarea_type = -1, rectangular, triangular, point_set };
@@ -30,11 +30,21 @@ inline std::istream &operator>>(std::istream &i, EntityTypeId &t) {
     case 3:
       t = EntityTypeId::portal;
       break;
+    case 4:
+      t = EntityTypeId::resurrection;
+      break;
     default:
       t = EntityTypeId::invalid_type;
       break;
   }
   return i;
+}
+
+inline std::string GeneratePath(std::string cur_path, const std::string &file_name) {
+  while ((!cur_path.empty()) && (cur_path.back() != '/') && (cur_path.back() != '\\')) {
+    cur_path.pop_back();
+  }
+  return cur_path + file_name;
 }
 
 // std::istream &operator>>(std::istream &i, DrawType &t) {

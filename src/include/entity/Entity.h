@@ -47,7 +47,7 @@ class Entity {
   inline void AddStatePic(const char *pic) { ++state_num_, state_pics_.emplace_back(pic); }
   inline int32_t GetEntityId() const { return entity_id_; }
 
-  int32_t SerializeTo(char *str);
+  virtual int32_t SerializeTo(char *str);
 
   friend int Collide(const Entity &en1, const Entity &en2);
   friend std::istream &operator>>(std::istream &i, Entity &entity);
