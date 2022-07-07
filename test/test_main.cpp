@@ -67,6 +67,7 @@ TEST(Colitest, Gametest){
   game.Load("test_map9.map");
   Qt::Key key = Qt::Key_Shift;
   Player* player  = reinterpret_cast<Player*>((game.GetEntitySet())[0]);
+
   game.CloseMap();
 }
 int main(int argc, char **argv) {
