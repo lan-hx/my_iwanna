@@ -62,7 +62,10 @@ TEST(Jumptest, Gametest){
   EXPECT_EQ(-6,player->GetVy());
   game.CloseMap();
 }
-TEST(Colitest, Gametest){}
+TEST(Colitest, Gametest){
+  Game game;
+  game.Load("test_map4.map");
+}
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
