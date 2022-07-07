@@ -37,5 +37,7 @@
         <file>platforms/trap2.gif</file>
         <file>platforms/trap3.gif</file>
         <file>platforms/door.png</file>
+        <file>platforms/Archive_point_off.png</file>
+        <file>platforms/Archive_point_on.png</file>
     </qresource>
 </RCC>
