@@ -36,5 +36,6 @@
         <file>platforms/trap1.gif</file>
         <file>platforms/trap2.gif</file>
         <file>platforms/trap3.gif</file>
+        <file>platforms/door.png</file>
     </qresource>
 </RCC>
