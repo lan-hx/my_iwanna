@@ -15,24 +15,27 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   ui->statusbar->addWidget(play_time_);
   death_count_ = new QLabel(this);
   ui->statusbar->addWidget(death_count_);
+  debug_output_ = new QLabel(this);
+  ui->statusbar->addWidget(debug_output_);
   fps_ = new QLabel(this);
   fps_->setFixedWidth(80);
   ui->statusbar->addPermanentWidget(fps_);
-  frame_lag_ = new QLabel(this);
-  frame_lag_->setFixedWidth(80);
-  ui->statusbar->addPermanentWidget(frame_lag_);
+  frame_latency_ = new QLabel(this);
+  frame_latency_->setFixedWidth(120);
+  ui->statusbar->addPermanentWidget(frame_latency_);
 
   game_ui_ = new GameUI(this);
   setCentralWidget(game_ui_);
-  game_ui_->setFixedSize(800, 600);
   adjustSize();
 
-  connect(game_ui_, &GameUI::UpdateInfo, [&](int64_t nsec, int32_t death_count, double play_time) {
-    play_time_->setText("played time: " + QString::number(play_time));
-    death_count_->setText("death count: " + QString::number(death_count));
-    fps_->setText("FPS: " + QString::number(1e9 / nsec, 'g', 4));
-    frame_lag_->setText("lag: " + QString::number(nsec / 1e6, 'g', 4) + "ms");
-  });
+  connect(game_ui_, &GameUI::UpdateInfo,
+          [&](int64_t nsec, int32_t death_count, double play_time, const char *debug_info) {
+            play_time_->setText(QString("played time: %1s").arg(QString::number(play_time, 'f', 0)));
+            death_count_->setText("death count: " + QString::number(death_count));
+            debug_output_->setText(debug_info);
+            fps_->setText("FPS: " + QString::number(1e9 / nsec, 'f', 2));
+            frame_latency_->setText("latency: " + QString::number(nsec / 1e6, 'f', 2) + "ms");
+          });
 
   // connect
   connect(this, &MainWindow::Pause, [&]() {
@@ -52,13 +55,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   connect(ui->actionopen, &QAction::triggered, [&]() {
     game_ui_->Pause();
     auto file_name = QFileDialog::getOpenFileName(this, "打开地图", "", "");
-    if (game_ui_->Load(file_name.toUtf8()) != 0) {
+    game_ui_->Load(file_name.toUtf8());
+  });
+  connect(game_ui_, &GameUI::LoadResult, [&](int32_t ret) {
+    if (ret != 0) {
       QMessageBox::warning(this, "打开失败", "打开地图失败");
     }
     game_ui_->Continue();
   });
   connect(ui->actionexit, &QAction::triggered, [&]() { close(); });
   connect(this, &MainWindow::SendKey, game_ui_, &GameUI::SendKey);
+  connect(this, &MainWindow::Restart, game_ui_, &GameUI::Restart);
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -67,6 +74,9 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
   switch (key) {
     case Qt::Key_P:
       emit Pause();
+      break;
+    case Qt::Key_R:
+      emit Restart();
       break;
     default:
       emit SendKey(event, true);

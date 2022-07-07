@@ -33,6 +33,7 @@ class Entity {
   inline DrawType GetDrawType() const { return draw_type_; }
   inline int32_t GetWidth() const { return width_; }
   inline int32_t GetHeight() const { return height_; }
+  inline int32_t GetStateNum() const { return state_num_; }
   void SetHidden(bool hidden) { hidden_ = hidden ? 1 : 0; }
   inline void SetCurState(const int32_t &state) { cur_state_ = state; }
   inline void SetDisplayPriority(const int32_t &priority) { display_priority_ = priority; }
@@ -43,7 +44,8 @@ class Entity {
   inline void SetWidth(const int32_t &w) { width_ = w; }
   inline void SetHeight(const int32_t &h) { height_ = h; }
   inline void SetStateNum(const int32_t &num) { state_num_ = num; }
-  inline void AddStatePic(char *pic) { ++state_num_, state_pics_.emplace_back(pic); }
+  inline void AddStatePic(const char *pic) { ++state_num_, state_pics_.emplace_back(pic); }
+  inline int32_t GetEntityId() const { return entity_id_; }
 
   int32_t SerializeTo(char *str);
 

@@ -1,6 +1,7 @@
 #ifndef MY_IWANNA_SRC_COMMON_COMMON_H_
 #define MY_IWANNA_SRC_COMMON_COMMON_H_
 
+#include <algorithm>
 #include <cassert>
 #include <cctype>
 #include <cstdint>
@@ -34,6 +35,13 @@ inline std::istream &operator>>(std::istream &i, EntityTypeId &t) {
       break;
   }
   return i;
+}
+
+inline std::string GeneratePath(std::string cur_path, const std::string &file_name) {
+  while ((!cur_path.empty()) && (cur_path.back() != '/') && (cur_path.back() != '\\')) {
+    cur_path.pop_back();
+  }
+  return cur_path + file_name;
 }
 
 // std::istream &operator>>(std::istream &i, DrawType &t) {

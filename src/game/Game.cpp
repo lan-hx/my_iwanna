@@ -1,5 +1,5 @@
 //
-// Created by lan on 2022/6/29.
+// Created by lan on 2022/7/4.
 //
 
 #include "game/Game.h"
@@ -28,10 +28,36 @@ Game::Game() {
   key_command_map_[Qt::Key_Right] = "Right";
   key_command_map_[Qt::Key_Shift] = "Jump";
   key_command_map_[Qt::Key_Z] = "Shoot";
+  key_command_map_[Qt::Key_A] = "Left";
+  key_command_map_[Qt::Key_D] = "Right";
+  Init();
+}
+
+void Game::Init() {
   command_state_["Left"] = 0;
   command_state_["Right"] = 0;
   command_state_["Jump"] = 0;
   command_state_["Shoot"] = 0;
+}
+
+const char *Game::GetDebugOutput() {
+  static std::string output;
+  output.clear();
+  Player *player = entities_->GetPlayer();
+  output = "x:" + std::to_string(player->GetX()) + " y:" + std::to_string(player->GetY());
+  return output.c_str();
+}
+
+void Game::Die() {
+  if (dead_) {
+    return;
+  }
+  dead_ = true;
+  ++death_cnt_;
+}
+
+void Game::Save() {
+  // to be implemented
 }
 
 int32_t Game::Load(const char *file_name) {
@@ -44,78 +70,126 @@ int32_t Game::Load(const char *file_name) {
     in_game_ = false;
     return 1;
   }
-  int32_t file_size;
+  cur_map_ = file_name;
   int32_t entity_num;
   int32_t entity_size;
-  int32_t cur_entity_size;
   EntityTypeId entity_type;
   std::vector<Entity *> entity_vec;
+  std::vector<Entity *> player_vec;
+  std::vector<Entity *> barrier_vec;
+  std::vector<Entity *> trap_vec;
+  std::vector<Entity *> portal_vec;
   int32_t background_len;
+  int32_t left_map_len;
+  int32_t right_map_len;
+  int32_t up_map_len;
+  int32_t down_map_len;
   dead_ = false;
   death_cnt_ = 0;
   step_cnt_ = 0LL;
-  ifs >> file_size >> entity_num;
+  ifs >> death_cnt_ >> step_cnt_;
+  ifs >> cur_resurrection_;
+  ifs >> entity_num;
   for (int i = 0; i < entity_num; ++i) {
     ifs >> entity_size >> entity_type;
-    try {
-      Entity *e = nullptr;
-      switch (entity_type) {
-        case EntityTypeId::player:
-          e = entity_vec.emplace_back(new Player());
-          ifs >> *static_cast<Player *>(e);
-          break;
-        case EntityTypeId::barrier:
-          e = entity_vec.emplace_back(new Barrier());
-          ifs >> *static_cast<Barrier *>(e);
-          break;
-        case EntityTypeId::trap:
-          e = entity_vec.emplace_back(new Trap());
-          ifs >> *static_cast<Trap *>(e);
-          break;
-        case EntityTypeId::portal:
-          e = entity_vec.emplace_back(new Portal());
-          ifs >> *static_cast<Portal *>(e);
-          break;
-        case EntityTypeId::invalid_type:
-          break;
-        default:;
-      }
-    } catch (std::exception &e) {
-      in_game_ = false;
-      return 1;
+    Entity *e = nullptr;
+    switch (entity_type) {
+      case EntityTypeId::player:
+        assert((player_vec.empty()) && ("Multiple Player Info"));
+        e = player_vec.emplace_back(new Player());
+        ifs >> *static_cast<Player *>(e);
+        break;
+      case EntityTypeId::barrier:
+        e = barrier_vec.emplace_back(new Barrier());
+        ifs >> *static_cast<Barrier *>(e);
+        break;
+      case EntityTypeId::trap:
+        e = trap_vec.emplace_back(new Trap());
+        ifs >> *static_cast<Trap *>(e);
+        break;
+      case EntityTypeId::portal:
+        e = portal_vec.emplace_back(new Portal());
+        ifs >> *static_cast<Portal *>(e);
+        break;
+      case EntityTypeId::invalid_type:
+        assert(true && ("Invalid Entity"));
+        break;
+      default:;
     }
   }
-  entities_ = new EntitySet(std::move(entity_vec));
+  // entities_ = new EntitySet(std::move(entity_vec));
+  entities_ = new EntitySet(std::move(player_vec), std::move(barrier_vec), std::move(trap_vec), std::move(portal_vec));
   ifs >> background_len;
-  ifs >> background_pic_;
-  assert((background_pic_.length() == background_len) && ("background picture path error"));
+  if (background_len > 0) {
+    ifs >> background_pic_;
+    assert((static_cast<int32_t>(background_pic_.length()) == background_len) && ("background picture path error"));
+  }
   ifs >> frame_rate_;
+  ifs >> left_map_len;
+  if (left_map_len > 0) {
+    ifs >> left_map_;
+    assert((static_cast<int32_t>(left_map_.length()) == left_map_len) && ("path error"));
+  }
+  ifs >> right_map_len;
+  if (right_map_len > 0) {
+    ifs >> right_map_;
+    assert((static_cast<int32_t>(right_map_.length()) == right_map_len) && ("path error"));
+  }
+  ifs >> up_map_len;
+  if (up_map_len > 0) {
+    ifs >> up_map_;
+    assert((static_cast<int32_t>(up_map_.length()) == up_map_len) && ("path error"));
+  }
+  ifs >> down_map_len;
+  if (down_map_len > 0) {
+    ifs >> down_map_;
+    assert((static_cast<int32_t>(down_map_.length()) == down_map_len) && ("path error"));
+  }
+  Init();
+  if (cur_resurrection_ >= 0) {
+    // to be implemented
+    // entities_->GetPlayer()->MoveTo(entities_->GetResurrection(cur_resurrection_)->GetX(),
+    // entities_->GetResurrection(cur_resurrection_)->GetY());
+  }
   if (ifs.eof()) {
     ifs.close();
     in_game_ = true;
+    emit LoadedCallBack(0);
     return 0;
   }
   ifs.close();
   in_game_ = false;
+  emit LoadedCallBack(1);
   return 1;
 }
 
-void Game::Reset() {
+void Game::CloseMap() {
+  Save();
   dead_ = false;
   death_cnt_ = 0;
   step_cnt_ = 0LL;
+  cur_map_.clear();
   entities_->Destroy();
   delete entities_;
   entities_ = nullptr;
   background_pic_.clear();
-  background_pic_ = nullptr;
+  left_map_.clear();
+  right_map_.clear();
+  up_map_.clear();
+  down_map_.clear();
   in_game_ = false;
   frame_rate_ = 60;
 }
 
-int32_t Game::ResetAndLoad(const char *file) {
-  Reset();
-  return Load(file);
+void Game::Restart() {
+  if (!dead_) {
+    Die();
+  }
+  int32_t death_cnt = death_cnt_;
+  int32_t step_cnt = step_cnt_;
+  Load(cur_map_.c_str());
+  death_cnt_ = death_cnt;
+  step_cnt_ = step_cnt;
 }
 
 void Game::Event(const Qt::Key &key, bool is_pressed) {
@@ -164,29 +238,40 @@ void Game::Step() {
   //         similar
   ++step_cnt_;
   Player *player = entities_->GetPlayer();
+  for (auto entity : entities_->GetEntitySet()) {
+    if (entity->GetType() != EntityTypeId::player) {
+      if ((step_cnt_ % entity->GetRefreshRate()) == 0) {
+        entity->SetCurState((entity->GetCurState() + 1) % entity->GetStateNum());
+      }
+    }
+  }
   std::unordered_set<Entity *> entity_set;
   int32_t left = command_state_["Left"];
   int32_t right = command_state_["Right"];
   int32_t jump = command_state_["Jump"];
-  bool collision = false;
   bool interrupt_jump = false;
   bool break_jump = false;
   bool land = false;
+  bool can_jump;
   //   bool shoot = command_state_["Shoot"];
-  if ((left ^ right) != 0) {
+  if ((left != 0) || (right != 0)) {
     if (left != 0) {
-      //   player->PrepareLeft();
-    } else {
-      //   player->PrepareRight();
+      player->PrepareLeft();
+    }
+    if (right != 0) {
+      player->PrepareRight();
     }
   } else {
-    // player->HorizontalIdle();
+    player->HorizontalIdle();
   }
   if ((jump & 4) != 0) {
     player->BreakJump();
   }
+  can_jump = player->CanJump();
   if ((jump & 1) != 0 || (jump & 2) != 0) {
-    player->PrepareJump();
+    if (can_jump) {
+      player->PrepareJump();
+    }
   }
   if ((jump & 1) == 0) {
     break_jump = true;
@@ -199,63 +284,175 @@ void Game::Step() {
   }
   int32_t dx = vx;
   int32_t dy = vy;
-  player->Move();
-  for (auto entity : entities_->GetEntitySet()) {
-    if (entity->GetType() == EntityTypeId::barrier) {
-      if (!entity->IsHidden()) {
-        switch (Collide(*player, *entity)) {
-          case 1:
-            entity_set.emplace(entity);
-            interrupt_jump = true;
-            break;
-          case 2:
-            entity_set.emplace(entity);
+  player->MoveTo(player->GetX(), player->GetY() + dy);
+  for (auto entity : entities_->GetBarrierSet()) {
+    if (!entity->IsHidden()) {
+      switch (Collide(*player, *entity)) {
+        case 1:
+          entity_set.emplace(entity);
+          if (vy > 0) {
             land = true;
-            break;
-          default:
-            break;
-        }
+          }
+          if (vy < 0) {
+            interrupt_jump = true;
+          }
+          break;
+        default:
+          break;
       }
     }
   }
   while (!entity_set.empty()) {
-    if ((dx == 0) && (dy == 0)) {
-      dead_ = true;
-      return;
+    if (dy == 0) {
+      Die();
     }
-    if (abs((dx - 1) * vy - vx * dy) < abs(dx * vy - vx * (dy - 1))) {
-      if (vx > 0) {
-        player->MoveByX(-1);
-        --dx;
-      } else {
-        player->MoveByX(1);
-        ++dx;
-      }
+    if (vy > 0) {
+      player->MoveByY(-1);
+      --dy;
     } else {
-      if (vy > 0) {
-        player->MoveByY(-1);
-        --dy;
-      } else {
-        player->MoveByY(1);
-        ++dy;
-      }
+      player->MoveByY(1);
+      ++dy;
     }
     for (auto entity : entity_set) {
-      if (Collide(*player, *entity) == 0) {
-        entity_set.erase(entity);
+      switch (Collide(*player, *entity)) {
+        case 0:
+          entity_set.erase(entity);
+          break;
+        default:
+          break;
       }
     }
   }
-  if (interrupt_jump) {
+  player->MoveTo(player->GetX() + dx, player->GetY());
+  for (auto entity : entities_->GetBarrierSet()) {
+    if (!entity->IsHidden()) {
+      switch (Collide(*player, *entity)) {
+        case 1:
+          entity_set.emplace(entity);
+          break;
+        default:
+          break;
+      }
+    }
+  }
+  while (!entity_set.empty()) {
+    if (dx == 0) {
+      Die();
+    }
+    if (vx > 0) {
+      player->MoveByX(-1);
+      --dx;
+    } else {
+      player->MoveByX(1);
+      ++dx;
+    }
+    for (auto entity : entity_set) {
+      switch (Collide(*player, *entity)) {
+        case 0:
+          entity_set.erase(entity);
+          break;
+        default:
+          break;
+      }
+    }
+  }
+  if (can_jump && interrupt_jump) {
     player->InteruptJump();
   }
   if (break_jump) {
     player->BreakJump();
   }
   if (land) {
-    player->SetYState(YState::landed);
+    player->SetYState(landed);
+  } else {
+    if (jump == 0) {
+      if (player->GetYState() == on_ground) {
+        player->SetYState(drifting);
+      }
+    }
   }
+
+  switch (player->GetYState()) {
+    case on_ground:
+    case landed:
+      if (player->GetXState() == idle) {
+        if (player->GetFacing() == 1) {
+          player->SetCurState(1);
+        } else {
+          player->SetCurState(5);
+        }
+      } else {
+        if (player->GetFacing() == 1) {
+          player->SetCurState(3);
+        } else {
+          player->SetCurState(7);
+        }
+      }
+      break;
+    default:
+      if (player->GetVy() < 0) {
+        if (player->GetFacing() == 1) {
+          player->SetCurState(2);
+        } else {
+          player->SetCurState(6);
+        }
+      } else {
+        if (player->GetFacing() == 1) {
+          player->SetCurState(0);
+        } else {
+          player->SetCurState(4);
+        }
+      }
+  }
+
+  for (auto entity : entities_->GetTrapSet()) {
+    if (!entity->IsHidden()) {
+      if (Collide(*player, *entity) != 0) {
+        Die();
+      }
+    }
+  }
+
   command_state_["Jump"] = command_state_["Jump"] & 1;
+
+  if (player->GetY() < 0) {
+    if (!up_map_.empty()) {
+      Load(GeneratePath(cur_map_, up_map_).c_str());
+      player->MoveTo(player->GetX(), player->GetY() + 600);
+    } else {
+      player->MoveTo(player->GetX(), 0);
+    }
+  }
+  if (player->GetY() >= 600) {
+    if (!down_map_.empty()) {
+      Load(GeneratePath(cur_map_, down_map_).c_str());
+      player->MoveTo(player->GetX(), player->GetY() - 600);
+    } else {
+      player->MoveTo(player->GetX(), 599);
+    }
+  }
+  if (player->GetX() < 0) {
+    if (!left_map_.empty()) {
+      Load(GeneratePath(cur_map_, left_map_).c_str());
+      player->MoveTo(player->GetX() + 800, player->GetY());
+    } else {
+      player->MoveTo(0, player->GetY());
+    }
+  }
+  if (player->GetX() >= 800) {
+    if (!right_map_.empty()) {
+      Load(GeneratePath(cur_map_, right_map_).c_str());
+      player->MoveTo(player->GetX() - 800, player->GetY());
+    } else {
+      player->MoveTo(799, player->GetY());
+    }
+  }
+  if (IsDead()) {
+    emit DieSignal();
+  }
+  emit StepCallBack();
+  emit UpdateFrame();
+  emit UpdateInfo(DeathCount(), PlayTime(), GetDebugOutput());
 }
 
 int32_t Collide(const Entity &en1, const Entity &en2) {
@@ -268,16 +465,14 @@ int32_t Collide(const Entity &en1, const Entity &en2) {
   int32_t maxx = en1.GetX() + ha1.GetX(1);
   int32_t miny = en1.GetY() + ha1.GetY(0);
   int32_t maxy = en1.GetY() + ha1.GetY(1);
+  int32_t ret = 0;
   switch (ha2.GetType()) {
     case rectangular:
       if ((maxx > en2.GetX() + ha2.GetX(0)) && (en2.GetX() + ha2.GetX(1) > minx) && (maxy > en2.GetY() + ha2.GetY(0)) &&
           (en2.GetY() + ha2.GetY(1) > miny)) {
-        if (maxy < en2.GetY() + ha2.GetY(1)) {
-          return 2;
-        }
-        return 1;
+        ret |= 1;
       }
-      return 0;
+      return ret;
     case triangular: {
       int32_t x1 = en2.GetX() + ha2.GetX(0);
       int32_t y1 = en2.GetY() + ha2.GetY(0);
