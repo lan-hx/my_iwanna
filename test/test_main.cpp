@@ -65,6 +65,8 @@ TEST(Jumptest, Gametest){
 TEST(Colitest, Gametest){
   Game game;
   game.Load("test_map4.map");
+  Qt::Key key = Qt::Key_Shift;
+  Player* player  = reinterpret_cast<Player*>((game.GetEntitySet())[0]);
 }
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
