@@ -1,7 +1,0 @@
-{
-  "name": "my-iwanna",
-  "version-string": "latest",
-  "dependencies": [
-    "gtest"
-  ]
-}

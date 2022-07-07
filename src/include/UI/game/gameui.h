@@ -4,6 +4,7 @@
 #include <QElapsedTimer>
 #include <QKeyEvent>
 #include <QLabel>
+#include <QSoundEffect>
 #include <QTimer>
 #include <QWidget>
 #include <cstdint>
@@ -30,6 +31,7 @@ class GameUI : public QWidget {
   void UpdateMovies();
   void UpdateInfoFromGame(int32_t death_count, double play_time, const char *debug_info);
   void AfterLoad(int32_t ret);
+  void DieHandle();
 
  private:
   Ui::GameUI *ui;  // NOLINT
@@ -40,6 +42,9 @@ class GameUI : public QWidget {
   int32_t timer_time_;
   std::unordered_map<int32_t, QLabel *> gifs_;
   QLabel *death_cover_;
+  QSoundEffect *bgm_;
+  QSoundEffect *death_sound_;
+  QSoundEffect *sound_;
 
  protected:
   void paintEvent(QPaintEvent *event) override;

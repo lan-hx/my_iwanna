@@ -16,7 +16,10 @@ GameUI::GameUI(QWidget *parent)
       ui(new Ui::GameUI),
       view_model_(this, this),
       timer_(new QTimer(this)),
-      death_cover_(new QLabel(this)) {
+      death_cover_(new QLabel(this)),
+      bgm_(new QSoundEffect(this)),
+      death_sound_(new QSoundEffect(this)),
+      sound_(nullptr) {
   ui->setupUi(this);
   setFixedSize(800, 600);
   connect(timer_, &QTimer::timeout, [&]() { emit StepSignal(); });
@@ -27,6 +30,10 @@ GameUI::GameUI(QWidget *parent)
   death_cover_->setPixmap(gameover);
   death_cover_->move((width() - gameover.width()) / 2, (height() - gameover.height()) / 2);
   death_cover_->hide();
+
+  // music
+  bgm_->setSource(QUrl::fromLocalFile("music/bgmusic1.wav"));
+  death_sound_->setSource(QUrl::fromLocalFile("music/death.wav"));
 
   // debug
   //  QLabel *l1 = new QLabel(this);
@@ -118,6 +125,8 @@ void GameUI::Stop() {
     delete gif.second;
   }
   gifs_.clear();
+  bgm_->stop();
+  death_sound_->stop();
 }
 void GameUI::Pause() { timer_->stop(); }
 void GameUI::Continue() { timer_->start(); }
@@ -127,6 +136,9 @@ void GameUI::SendKey(QKeyEvent *event, bool is_pressed) {
 }
 void GameUI::Restart() {
   emit RestartSignal();
+  death_sound_->stop();
+  bgm_->play();
+  bgm_->setMuted(false);
   Continue();
 }
 void GameUI::UpdateMovies() {
@@ -160,5 +172,13 @@ void GameUI::UpdateInfoFromGame(int32_t death_count, double play_time, const cha
 void GameUI::AfterLoad(int32_t ret) {
   timer_->setInterval(1000 / view_model_.GetFrameRate());
   timer_->start();
+  death_sound_->stop();
+  bgm_->play();
   emit LoadResult(ret);
+}
+
+void GameUI::DieHandle() {
+  bgm_->setMuted(true);
+  death_sound_->play();
+  Pause();
 }
