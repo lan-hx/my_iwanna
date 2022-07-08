@@ -15,7 +15,8 @@
 class HotArea {
  public:
   explicit HotArea() { type_ = invalid_hotarea_type; }
-  HotArea &operator=(const HotArea &ha) = default;
+  HotArea(const HotArea &) = default;
+  inline HotArea &operator=(const HotArea &ha) = default;
   HotAreaType GetType() const;
   int32_t GetX(const size_t &index) const;
   int32_t GetY(const size_t &index) const;

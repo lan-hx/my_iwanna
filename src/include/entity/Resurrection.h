@@ -10,10 +10,10 @@ class Resurrection : public Entity {
  public:
   explicit Resurrection() : Entity(resurrection) {}
 
-  friend std::istream &operator>>(std::istream &i, Resurrection &b);
+  friend std::istream &operator>>(std::istream &i, Resurrection &r);
 
  private:
 };
 
-std::istream &operator>>(std::istream &i, Resurrection &b);
+std::istream &operator>>(std::istream &i, Resurrection &r);
 #endif  // MY_IWANNA_RESURRECTION_H

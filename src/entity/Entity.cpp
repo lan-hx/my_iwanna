@@ -10,8 +10,6 @@ int32_t Entity::entity_id_cnt = 0;
 
 Entity::Entity(EntityTypeId type) : type_(type) { entity_id_ = entity_id_cnt++; }
 
-Entity::~Entity() = default;
-
 std::istream &operator>>(std::istream &i, Entity &e) {
   int32_t str_len;
   int32_t draw_type;

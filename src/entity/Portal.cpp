@@ -12,7 +12,7 @@ std::istream &operator>>(std::istream &i, Portal &p) {
   if (map_len > 0) {
     i >> p.map_;
   }
-  assert((map_len == p.map_.length()) && ("path error"));
+  assert((map_len == static_cast<int32_t>(p.map_.length())) && ("path error"));
   return i;
 }
 
@@ -21,7 +21,7 @@ int32_t Portal::SerializeTo(char *str) {
   size += Entity::SerializeTo(str);
   sprintf(str + size, "%8d", success_);
   size += 8;
-  sprintf(str + size, "%8d", map_.length());
+  sprintf(str + size, "%8lld", map_.length());
   size += 8;
   sprintf(str + size, " %s", map_.c_str());
   size += map_.length() + 1;

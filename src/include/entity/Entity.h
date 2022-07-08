@@ -15,7 +15,7 @@
 class Entity {
  public:
   explicit Entity(EntityTypeId type);
-  ~Entity();
+  virtual ~Entity() = default;
   inline int32_t GetX() const { return x_; }
   inline int32_t GetY() const { return y_; }
   void SetPos(const int32_t &x, const int32_t &y) { x_ = x, y_ = y; }

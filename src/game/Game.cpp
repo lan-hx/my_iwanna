@@ -63,8 +63,8 @@ void Game::Save(const int32_t &resurrection_index) {
   int size = 0;
   sprintf(s + size, "%8d", death_cnt_);
   size += 8;
-  sprintf(s + size, "%8d", step_cnt_);
-  size += 8;
+  sprintf(s + size, "%16lld", step_cnt_);
+  size += 16;
   sprintf(s + size, "%8d", resurrection_index);
   size += 8;
   size += entities_->SerializeTo(s + size);
