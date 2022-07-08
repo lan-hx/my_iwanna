@@ -424,7 +424,7 @@ void Game::Step() {
   bool land = false;
   bool can_jump;
   //   bool shoot = command_state_["Shoot"];
-  if ((left != 0) || (right != 0)) {
+  if ((left != 0) ^ (right != 0)) {
     if (left != 0) {
       player->PrepareLeft();
     }
